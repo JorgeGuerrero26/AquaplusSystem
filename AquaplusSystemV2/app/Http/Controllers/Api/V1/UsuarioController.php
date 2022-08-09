@@ -110,6 +110,29 @@ class UsuarioController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
         }
-    }           
+    }      
+    
+    public function loginUsuario(Request $request){
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'clave' => 'required',
+            ]);
+            $usuario = Usuario::where('email', $request->email)->first();
+            if ($usuario) {
+                if ($usuario->clave == $request->clave) {
+                    return response()->json(['data' => $usuario,'status' => 'true'],200);
+                } else {
+                    return response()->json(['data' => 'Clave incorrecta','status' => 'false'],401);
+                }
+            } else {
+                return response()->json(['data' => 'Usuario no encontrado','status' => 'false'],404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
+        }
+    }
        
 }

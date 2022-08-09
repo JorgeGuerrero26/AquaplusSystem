@@ -28,6 +28,10 @@ class DatabaseSeeder extends Seeder
         \App\Models\Tipo_usuario::factory(2)->create();
         \App\Models\Usuario::factory(10)->create();
         \App\Models\Material::factory(10)->create();
+        \App\Models\Venta::factory(10)->create();
+        \App\Models\Detalle_venta::factory(10)->create();
+        \App\Models\Compra::factory(10)->create();
+        \App\Models\Detalle_compra::factory(10)->create();
 
     }
 }

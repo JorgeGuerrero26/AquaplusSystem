@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Detalle_compra>
  */
-class DetalleCompraFactory extends Factory
+class Detalle_compraFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -17,7 +17,11 @@ class DetalleCompraFactory extends Factory
     public function definition()
     {
         return [
-            //
+            'compra_id' => $this->faker->numberBetween(1, 10),
+            'material_id' => $this->faker->numberBetween(1, 10),
+            'cantidad_comprada' => $this->faker->numberBetween(1, 10),
+            'precio_unitario' => $this->faker->numberBetween(1, 10),
+        
         ];
     }
 }

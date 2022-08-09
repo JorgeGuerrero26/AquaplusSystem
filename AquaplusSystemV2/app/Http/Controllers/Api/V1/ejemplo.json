@@ -1,4 +1,4 @@
-[
+/* [
     {
         "zona_entrega":"AC1",
         "direccion_entrega":"Av quiñonez 729"
@@ -8,3 +8,13 @@
         "direccion_entrega":"Av aaad 456"
     }
 ]
+
+[
+    {
+        "cantidad_entregada":"1",
+        "cantidad_recibida":"10",
+        "precio_unitario":"200"
+        "material_id":"1"
+    },   
+]
+ */
