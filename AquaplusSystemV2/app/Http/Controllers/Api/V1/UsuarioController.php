@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Usuario;
+use App\Models\Tipo_usuario;
 use Illuminate\Http\Request;
 
 class UsuarioController extends Controller
@@ -128,6 +129,17 @@ class UsuarioController extends Controller
             } else {
                 return response()->json(['data' => 'Usuario no encontrado','status' => 'false'],404);
             }
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
+        }
+    }
+
+    public function listarTiposUsuarios() {
+        try {
+            $tiposUsuarios = Tipo_usuario::all();
+            return response()->json(['data' => $tiposUsuarios,'status' => 'true'],200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
         } catch (\Throwable $th) {

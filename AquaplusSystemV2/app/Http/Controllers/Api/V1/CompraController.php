@@ -215,4 +215,28 @@ class CompraController extends Controller
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
     }
+
+    public function buscarComprasDeUnProveedor(Request $request){
+        try {
+            $request->validate([
+                'proveedor_id' => 'required',
+            ]);
+            $compras = Compra::where('proveedor_id', $request->proveedor_id)->get();
+            //Recorrer cada compra para obtener el detalle de la compra
+            foreach ($compras as $compra) {
+                $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
+                //Calcular el total de la compra
+                $total = 0;
+                foreach ($compra->detalle_compra as $detalle) {
+                    $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
+                }
+                $compra->total_compra = $total;
+            }
+            return response()->json(['data' => $compras, 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Models\Material;
+use App\Models\Tipo_material;
 use Illuminate\Http\Request;
 
 class MaterialController extends Controller
@@ -140,6 +141,17 @@ class MaterialController extends Controller
             
             
             return response()->json(['data' => 'Material eliminado', 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
+    public function listarTiposMateriales(){
+        try {
+            $tiposMateriales = Tipo_material::all();
+            return response()->json(['data' => $tiposMateriales, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {

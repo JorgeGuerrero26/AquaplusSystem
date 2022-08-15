@@ -37,6 +37,7 @@ Route::post('/insertarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@i
 Route::post('/actualizarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@actualizarUsuarios');
 Route::post('/eliminarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@eliminarUsuarios');
 Route::post('/loginUsuario','App\Http\Controllers\Api\V1\UsuarioController@loginUsuario');
+
 //Materiales
 Route::post('/buscarMateriales','App\Http\Controllers\Api\V1\MaterialController@buscarMateriales');
 Route::get('/listarMateriales','App\Http\Controllers\Api\V1\MaterialController@listarMateriales');
@@ -57,4 +58,10 @@ Route::post('/insertarCompras','App\Http\Controllers\Api\V1\CompraController@ins
 Route::post('/actualizarCompras','App\Http\Controllers\Api\V1\CompraController@actualizarCompras');
 Route::post('/eliminarCompras','App\Http\Controllers\Api\V1\CompraController@eliminarCompras');
 Route::post('/buscarCompras_Id','App\Http\Controllers\Api\V1\CompraController@buscarCompras_Id');
+
+//Nuevo
+Route::get('listarTiposUsuarios','App\Http\Controllers\Api\V1\UsuarioController@listarTiposUsuarios');
+Route::get('listarTiposMateriales','App\Http\Controllers\Api\V1\MaterialController@listarTiposMateriales');
+Route::post('buscarVentasPorCliente','App\Http\Controllers\Api\V1\VentaController@buscarVentasDeUnCliente');
+Route::post('buscarComprasPorProveedor','App\Http\Controllers\Api\V1\CompraController@buscarComprasDeUnProveedor');
 

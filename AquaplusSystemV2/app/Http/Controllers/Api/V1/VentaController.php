@@ -117,7 +117,7 @@ class VentaController extends Controller
         }
     }
 
-    public function buscarVentasPorFechas(Request $request)
+    public function buscarVentasPorFechas(Request $request) //Preguntar si se deberia buscar tambien por cliente
     {
         try {
             //Validar que envie un rango de fechas y que sean fechas
@@ -237,5 +237,29 @@ class VentaController extends Controller
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
         
+    }
+
+    public function buscarVentasDeUnCliente(Request $request){
+        try {
+            $request->validate([
+                'cliente_id' => 'required|integer',
+            ]);
+            $ventas = Venta::where('cliente_id', $request->cliente_id)->get();
+            //Recorrer cada venta para obtener el detalle de la venta
+            foreach ($ventas as $venta) {
+                $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
+                //Calcular el total de la venta
+                $total = 0;
+                foreach ($venta->detalle_venta as $detalle) {
+                    $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
+                }
+                $venta->total_venta = $total;
+            }
+            return response()->json(['data' => $ventas, 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
     }
 }
