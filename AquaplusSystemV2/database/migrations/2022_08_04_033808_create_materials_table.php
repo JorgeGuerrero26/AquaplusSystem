@@ -17,10 +17,8 @@ return new class extends Migration
             $table->id();
             $table->unsignedFloat('precio');
             $table->text('descripcion');
-            $table->unsignedBigInteger('tipo_material_id');
-
+            $table->unsignedInteger('stock_actual')->default(0);          
             $table->timestamps();
-            $table->foreign('tipo_material_id')->references('id')->on('tipo_materiales');
         });
     }
 

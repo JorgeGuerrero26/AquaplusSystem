@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Usuario;
 use App\Models\Tipo_usuario;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UsuarioController extends Controller
 {
@@ -13,7 +14,18 @@ class UsuarioController extends Controller
     public function listarUsuarios()
     {
         try {
-            $usuarios = Usuario::all();
+            
+
+
+            $usuarios = DB::select('select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,estado,created_at,updated_at from usuarios');
+            //Agregar la descripcion del tipo de usuario_id
+            foreach ($usuarios as $usuario) {
+                $usuario->tipo_usuario = Tipo_usuario::find($usuario->tipo_usuario)->descripcion;
+            }                 
+        
+            
+           
+
             return response()->json(['data' => $usuarios,'status' => 'true'],200);            
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);

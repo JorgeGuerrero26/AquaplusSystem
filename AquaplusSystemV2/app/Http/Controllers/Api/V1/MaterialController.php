@@ -104,12 +104,14 @@ class MaterialController extends Controller
                 'id' => 'required',
                 'tipo_material_id' => 'required',            
                 'descripcion' => 'required|unique:materiales,descripcion,' . $request->id,
+                'stock_actual' => 'required|integer',   
                 'precio' => 'required|numeric',               
             ]);      
             $material = Material::find($request->id);
         
             $material->tipo_material_id = $request->tipo_material_id;     
             $material->descripcion = $request->descripcion;
+            $material->stock_actual = $request->stock_actual;
             $material->precio = $request->precio;
             $material->save();
             return response()->json(['data' => 'Material actualizado', 'status' => 'true'], 200);

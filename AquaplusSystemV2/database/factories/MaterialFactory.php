@@ -18,8 +18,7 @@ class MaterialFactory extends Factory
     {
         return [
             'precio'=> $this->faker->numberBetween(1,100),
-            'descripcion'=> $this->faker->text,
-            'tipo_material_id'=> $this->faker->numberBetween(1,2),
+            'descripcion'=> $this->faker->text,    
         ];
     }
 }
