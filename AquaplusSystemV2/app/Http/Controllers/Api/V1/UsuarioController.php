@@ -17,7 +17,7 @@ class UsuarioController extends Controller
             
 
 
-            $usuarios = DB::select('select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,estado,created_at,updated_at from usuarios');
+            $usuarios = DB::select('select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,tipo_usuario_id,estado,created_at,updated_at from usuarios');
             //Agregar la descripcion del tipo de usuario_id
             foreach ($usuarios as $usuario) {
                 $usuario->tipo_usuario = Tipo_usuario::find($usuario->tipo_usuario)->descripcion;
