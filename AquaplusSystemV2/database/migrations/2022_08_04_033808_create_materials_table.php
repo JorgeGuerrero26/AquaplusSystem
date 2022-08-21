@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedFloat('precio');
             $table->text('descripcion');
             $table->unsignedInteger('stock_actual')->default(0);          
+            $table->boolean('estado')->default(true);
             $table->timestamps();
         });
     }

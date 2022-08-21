@@ -115,9 +115,11 @@ class UsuarioController extends Controller
             $request->validate([
                 'id' => 'required',
             ]);
+            //Cambiar el usuario a estado 0
             $usuario = Usuario::find($request->id);
-            $usuario->delete();
-            return response()->json(['data' =>'Usuario eliminado con exito','status' => 'true'],200);            
+            $usuario->estado = 0;
+            $usuario->save();            
+            return response()->json(['data' =>'Usuario dado de baja con exito','status' => 'true'],200);            
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
         } catch (\Throwable $th) {

@@ -229,6 +229,7 @@ class ClienteController extends Controller
                 'nombre' => 'required',            
                 'documento' => 'required|integer',
                 'entregas' => 'required',
+                'saldo_botellon' => 'required|integer',
                 'estado' => 'required',
             ]);
           
@@ -245,6 +246,7 @@ class ClienteController extends Controller
                     $cliente->nombre = $request->nombre;
                     $cliente->documento = $request->documento;
                     $cliente->estado = $request->estado;
+                    $cliente->saldo_botellon = $request->saldo_botellon;
                     $cliente->save();                  
                     //Obtener el json de entregas del cliente
                     $entregas = $request->entregas;
