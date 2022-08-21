@@ -311,4 +311,28 @@ class ClienteController extends Controller
         }
        
     }
+
+    public function buscarClientePorId(Request $request){
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $cliente = Cliente::find($request->id);
+            $entregas = Entrega::where('cliente_id', $cliente->id)->get();
+            return response()->json([
+                'data' => [
+                    'cliente' => $cliente,
+                    'entregas' => $entregas
+                ],
+                'status' => 'true'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => [
+                    $th->getMessage()
+                ],
+                'status' => 'false'
+            ]);
+        }
+    }
 }

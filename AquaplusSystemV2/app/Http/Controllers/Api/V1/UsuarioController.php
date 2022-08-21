@@ -160,5 +160,19 @@ class UsuarioController extends Controller
             return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
         }
     }
+
+    public function buscarUsuarioPorId(Request $request){
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $usuario = Usuario::find($request->id);          
+            return response()->json(['data' => $usuario,'status' => 'true'],200);         
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
+        }
+    }
        
 }

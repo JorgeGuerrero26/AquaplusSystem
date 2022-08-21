@@ -147,4 +147,18 @@ class ProveedorController extends Controller
         }
 
     }
+
+    public function buscarProveedorPorId(Request $request){
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $proveedor = Proveedor::find($request->id);        
+            return response()->json(['data' => $proveedor, 'status' => 'true'], 200);            
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);                   
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
 }

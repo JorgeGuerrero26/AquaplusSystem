@@ -162,4 +162,19 @@ class MaterialController extends Controller
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
     }
+
+    public function buscarMaterialPorId(Request $request){
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $material = Material::find($request->id);
+            return response()->json(['data' => $material, 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
 }

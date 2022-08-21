@@ -65,3 +65,8 @@ Route::get('listarTiposMateriales','App\Http\Controllers\Api\V1\MaterialControll
 Route::post('buscarVentasPorCliente','App\Http\Controllers\Api\V1\VentaController@buscarVentasDeUnCliente');
 Route::post('buscarComprasPorProveedor','App\Http\Controllers\Api\V1\CompraController@buscarComprasDeUnProveedor');
 
+//Nuevo 20-08-2022
+Route::post('buscarClientePorId','App\Http\Controllers\Api\V1\ClienteController@buscarClientePorId');
+Route::post('buscarMaterialPorId','App\Http\Controllers\Api\V1\MaterialController@buscarMaterialPorId');
+Route::post('buscarUsuarioPorId','App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarioPorId');
+Route::post('buscarProveedorPorId','App\Http\Controllers\Api\V1\ProveedorController@buscarProveedorPorId');
