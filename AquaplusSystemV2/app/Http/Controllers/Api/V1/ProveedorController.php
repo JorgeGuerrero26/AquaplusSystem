@@ -129,13 +129,17 @@ class ProveedorController extends Controller
      * @param  \App\Models\Proveedor  $proveedor
      * @return \Illuminate\Http\Response
      */
-    public function eliminarProveedores(Proveedor $proveedor)
+    public function eliminarProveedores(Request $request)
     {
         try {
-            //eliminar proveedor en forma de cascada
-            $proveedor->delete();
-            
-            return response()->json(['data' => 'Proveedor eliminado', 'status' => 'true'], 200);
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $proveedor = Proveedor::find($request->id);
+            $proveedor->estado = 0;
+            $proveedor->save();
+                            
+            return response()->json(['data' => 'Proveedor dado de baja con exito', 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);                   
         } catch (\Throwable $th) {

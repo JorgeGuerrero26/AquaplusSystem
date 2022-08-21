@@ -290,29 +290,13 @@ class ClienteController extends Controller
 
     public function eliminarClientes(Request $request){
         try {
-            //Validar que se hayan enviado todos los parametros
-            if ($request->has('id')) {
-                DB::beginTransaction();
-                //Empezar a captuarar los datos del cliente
-                Entrega::where('cliente_id', $request->id)->delete();
-                $cliente = Cliente::find($request->id);                                                                                            
-                $cliente->delete();
-                //Eliminar todas las entregas que tenga el cliente seleccionado                
-                DB::commit();
-                return response()->json([
-                    'data' => [
-                        'Cliente eliminado correctamente'
-                    ],
-                    'status' => 'true'
-                ]);
-            } else {
-                return response()->json([
-                    'data' => [
-                        'Faltan parametros'
-                    ],
-                    'status' => 'false'
-                ]);
-            }
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $cliente = Cliente::find($request->id);
+            $cliente->estado = 0;
+            $cliente->save();
+        
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([

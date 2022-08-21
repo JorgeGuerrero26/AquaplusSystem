@@ -139,11 +139,12 @@ class MaterialController extends Controller
                 'id' => 'required',
             ]);
             $material = Material::find($request->id);
-            $material->delete();
+            $material->estado = 0;
+            $material->save();
             
             
             
-            return response()->json(['data' => 'Material eliminado', 'status' => 'true'], 200);
+            return response()->json(['data' => 'Material dado de baja con exito', 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
