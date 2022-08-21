@@ -95,6 +95,7 @@ class UsuarioController extends Controller
                 'tipo_usuario_id' => 'required',
                 'nombre' => 'required|unique:usuarios,nombre,' . $request->id,
                 'email' => 'required|email|unique:usuarios,email,' . $request->id,
+                'estado' => 'required|boolean',
                 'clave' => 'required',
             ]);
             $usuario = Usuario::find($request->id);

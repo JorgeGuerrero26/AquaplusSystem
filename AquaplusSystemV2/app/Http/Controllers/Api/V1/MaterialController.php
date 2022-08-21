@@ -37,13 +37,11 @@ class MaterialController extends Controller
     {
         try {
             //validar que el ruc sea unicamente de 11 caracteres numericos
-            $request->validate([                
-                'tipo_material_id' => 'required',            
+            $request->validate([                                           
                 'descripcion' => 'required|unique:materiales',
                 'precio' => 'required|numeric',               
             ]);      
-            $material = new Material();          
-            $material->tipo_material_id = $request->tipo_material_id;     
+            $material = new Material();                   
             $material->descripcion = $request->descripcion;
             $material->precio = $request->precio;
             $material->save();
@@ -101,18 +99,16 @@ class MaterialController extends Controller
         try {
             //que la descripcion sea unico ignorando el actual
             $request->validate([
-
-                'id' => 'required',
-                'tipo_material_id' => 'required',            
+                'id' => 'required',                    
                 'descripcion' => 'required|unique:materiales,descripcion,' . $request->id,
                 'stock_actual' => 'required|integer',   
+                'estado' => 'required|boolean',
                 'precio' => 'required|numeric',               
             ]);      
-            $material = Material::find($request->id);
-        
-            $material->tipo_material_id = $request->tipo_material_id;     
+            $material = Material::find($request->id);                 
             $material->descripcion = $request->descripcion;
             $material->stock_actual = $request->stock_actual;
+            $material->estado = $request->estado;
             $material->precio = $request->precio;
             $material->save();
             return response()->json(['data' => 'Material actualizado', 'status' => 'true'], 200);
@@ -152,7 +148,7 @@ class MaterialController extends Controller
         }
     }
 
-    public function listarTiposMateriales(){
+/*     public function listarTiposMateriales(){
         try {
             $tiposMateriales = Tipo_material::all();
             return response()->json(['data' => $tiposMateriales, 'status' => 'true'], 200);
@@ -161,7 +157,7 @@ class MaterialController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
-    }
+    } */
 
     public function buscarMaterialPorId(Request $request){
         try {
