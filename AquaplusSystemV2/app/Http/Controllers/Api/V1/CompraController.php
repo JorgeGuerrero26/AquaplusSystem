@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Compra;
 use App\Models\Detalle_compra;
+use App\Models\Proveedor;
+use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -19,7 +21,16 @@ class CompraController extends Controller
     {
         try {
             $compras = Compra::all();
+            //Agregar el nombre del proveedor y el nombre del usuario
+            foreach ($compras as $compra) {
+                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+            }
+
+
             //Recorrer cada compra para obtener el detalle de la compra
+
+
             foreach ($compras as $compra) {
                 $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
                 //Calcular el total de la compra

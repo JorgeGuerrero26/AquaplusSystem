@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Venta;
 use App\Models\Detalle_venta;
+use App\Models\Cliente;
+use App\Models\Usuario;
+
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 
@@ -18,7 +21,14 @@ class VentaController extends Controller
     public function listarVentas()
     {
         try {
-            $ventas = Venta::all();
+            $ventas = Venta::all();           
+            //Agregar el nombre del cliente y el nombre del usuario
+            foreach ($ventas as $venta) {
+                $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+                $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+            }
+
+
             //Recorrer cada venta para obtener el detalle de la venta
             foreach ($ventas as $venta) {
                 $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
