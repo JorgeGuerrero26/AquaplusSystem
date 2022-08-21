@@ -15,8 +15,8 @@ class ClienteController extends Controller
     public function listarClientes()
     {
         try {
-            //Listar todos los clientes
-            $clientes = Cliente::all();
+            //Listar todos los clientes que su estado sea 1
+            $clientes = Cliente::where('estado',1)->get();
             //recorrer la lista y buscar sus entregas
             foreach ($clientes as $cliente) {
                 $cliente->entregas = Entrega::where('cliente_id', $cliente->id)->get();

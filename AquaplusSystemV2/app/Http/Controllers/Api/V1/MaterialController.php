@@ -17,7 +17,8 @@ class MaterialController extends Controller
     public function listarMateriales()
     {
         try {
-            $materiales = Material::all();
+            //Listar materiales que esten activos
+            $materiales = Material::where('estado',1)->get();
             return response()->json(['data' => $materiales, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);

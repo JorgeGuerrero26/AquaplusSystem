@@ -12,7 +12,9 @@ class ProveedorController extends Controller
     public function listarProveedores()
     {
         try {
-            $proveedores = Proveedor::all();
+            //Listar proveedores que esten activos
+            $proveedores = Proveedor::where('estado',1)->get();
+         
             return response()->json(['data' => $proveedores, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
