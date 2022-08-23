@@ -287,7 +287,8 @@ class ClienteController extends Controller
             ]);
         }
     }
-
+    
+    
     public function eliminarClientes(Request $request){
         try {
             $request->validate([
@@ -296,7 +297,12 @@ class ClienteController extends Controller
             $cliente = Cliente::find($request->id);
             $cliente->estado = 0;
             $cliente->save();
-        
+            return response()->json([
+                'data' => [
+                    'Cliente dado de baja correctamente'
+                ],
+                'status' => 'true'
+            ]);                    
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([
