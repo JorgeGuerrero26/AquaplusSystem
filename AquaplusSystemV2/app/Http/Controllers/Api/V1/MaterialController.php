@@ -79,7 +79,7 @@ class MaterialController extends Controller
                     return response()->json(['data' => 'No se encontraron materiales', 'status' => 'false'], 404);
                 }
             } else {
-                $materiales = Material::all();
+                $materiales = Material::where('estado',1)->get();
             }
             return response()->json(['data' => $materiales, 'status' => 'true'], 200);
         } catch (\Throwable $th) {

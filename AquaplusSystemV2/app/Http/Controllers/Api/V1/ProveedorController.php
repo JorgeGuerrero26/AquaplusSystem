@@ -83,7 +83,7 @@ class ProveedorController extends Controller
                     return response()->json(['data' => 'No se encontraron proveedores', 'status' => 'false'], 404);
                 }
             } else {
-                $proveedores = Proveedor::all();
+                $proveedores = Proveedor::where('estado',1)->get();
             }            
             return response()->json(['data' => $proveedores, 'status' => 'true'], 200);
         } catch (\Exception $e) {

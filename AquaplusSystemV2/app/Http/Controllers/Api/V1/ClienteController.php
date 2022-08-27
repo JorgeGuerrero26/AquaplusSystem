@@ -117,7 +117,7 @@ class ClienteController extends Controller
                     }
                 } else {
                     //retornar todos los clientes con sus respectivas entregas 
-                    $clientes = Cliente::all();
+                    $clientes = Cliente::where('estado',1)->get();
                     //recorrer a los clientes para sacar sus entregas
                     foreach ($clientes as $cliente) {
                         $entregas = Entrega::where('cliente_id', $cliente->id)->get();
@@ -340,5 +340,7 @@ class ClienteController extends Controller
                 'status' => 'false'
             ]);
         }
-    }
+    }        
+
+  
 }

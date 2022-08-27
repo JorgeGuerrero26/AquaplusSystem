@@ -78,7 +78,7 @@ class UsuarioController extends Controller
                     return response()->json(['data' => 'No se encontraron usuarios','status' => 'false'],404);
                 }
             } else {
-                $usuarios = Usuario::all();
+                $usuarios = DB::select('select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,tipo_usuario_id,estado,created_at,updated_at from usuarios where estado = 1');
             }
             return response()->json(['data' => $usuarios,'status' => 'true'],200);
         } catch (\Throwable $th) {
