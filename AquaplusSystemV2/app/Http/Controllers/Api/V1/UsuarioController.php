@@ -65,20 +65,32 @@ class UsuarioController extends Controller
             //Si envio por el nombre buscar los nombres parecidos, si envio por email buscar los emails parecidos y si no envio nada traer todos los usuarios
             if ($request->nombre) {
                 //Buscar nombres parecidos
-                $usuarios = Usuario::where('nombre', 'like', '%' . $request->nombre . '%')->get();           
+                $usuarios = DB::select("select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,tipo_usuario_id,estado,created_at,updated_at from usuarios where estado = 1 and nombre like '%".$request->nombre."%'");           
+                foreach ($usuarios as $usuario) {
+                    $usuario->tipo_usuario = Tipo_usuario::find($usuario->tipo_usuario)->descripcion;
+                }                 
+            
                 //Si no lo encuentra
                 if (count($usuarios) == 0) {
                     return response()->json(['data' => 'No se encontraron usuarios','status' => 'false'],404);
                 }    
             } elseif ($request->email) {
                 //Buscar emails parecidos
-                $usuarios = Usuario::where('email', 'like', '%' . $request->email . '%')->get();   
+                $usuarios = DB::select("select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,tipo_usuario_id,estado,created_at,updated_at from usuarios where estado = 1 and email like '%".$request->email."%'");           
+                foreach ($usuarios as $usuario) {
+                    $usuario->tipo_usuario = Tipo_usuario::find($usuario->tipo_usuario)->descripcion;
+                }                 
+            
+
                 //Si no lo encuentra
                 if (count($usuarios) == 0) {
                     return response()->json(['data' => 'No se encontraron usuarios','status' => 'false'],404);
                 }
             } else {
                 $usuarios = DB::select('select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,tipo_usuario_id,estado,created_at,updated_at from usuarios where estado = 1');
+                foreach ($usuarios as $usuario) {
+                    $usuario->tipo_usuario = Tipo_usuario::find($usuario->tipo_usuario)->descripcion;
+                }        
             }
             return response()->json(['data' => $usuarios,'status' => 'true'],200);
         } catch (\Throwable $th) {
