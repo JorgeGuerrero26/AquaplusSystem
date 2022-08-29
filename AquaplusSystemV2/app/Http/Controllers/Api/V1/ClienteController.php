@@ -49,9 +49,7 @@ class ClienteController extends Controller
                     }
 
                     return response()->json([
-                        'data' => [
-                            'cliente' => $cliente,
-                        ],
+                        'data' =>  $cliente,                        
                         'status' => 'true'
                     ]);
                 } else {
@@ -99,12 +97,12 @@ class ClienteController extends Controller
                         //recorrer la coleccion de clientes y sacar las entregas
                         foreach ($cliente as $key => $value) {
                             $entregas = Entrega::where('cliente_id', $value->id)->get();
-                            $cliente[$key]->entregas = $entregas;
+                            $cliente[$key]['entregas'] = $entregas;
                         }
                         return response()->json([
-                            'data' => [
+                            'data' => 
                                 $cliente,
-                            ],
+                            
                             'status' => 'true'
                         ]);
                     } else {
@@ -124,9 +122,8 @@ class ClienteController extends Controller
                         $cliente->entregas = $entregas;
                     }
                     return response()->json([
-                        'data' => [
-                            'clientes' => $clientes
-                        ],
+                        'data' => $clientes
+                        ,
                         'status' => 'true'
                     ]);
                 }
