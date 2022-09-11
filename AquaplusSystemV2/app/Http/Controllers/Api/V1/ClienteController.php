@@ -48,7 +48,7 @@ class ClienteController extends Controller
                     }
 
                     return response()->json([
-                        'data' =>  $cliente,                        
+                        'data' =>  $cliente,
                         'status' => 'true'
                     ]);
                 } else {
@@ -99,9 +99,9 @@ class ClienteController extends Controller
                             $cliente[$key]['entregas'] = $entregas;
                         }
                         return response()->json([
-                            'data' => 
+                            'data' =>
                                 $cliente,
-                            
+
                             'status' => 'true'
                         ]);
                     } else {
@@ -113,7 +113,7 @@ class ClienteController extends Controller
                         ]);
                     }
                 } else {
-                    //retornar todos los clientes con sus respectivas entregas 
+                    //retornar todos los clientes con sus respectivas entregas
                     $clientes = Cliente::where('estado',1)->get();
                     //recorrer a los clientes para sacar sus entregas
                     foreach ($clientes as $cliente) {
@@ -143,7 +143,7 @@ class ClienteController extends Controller
         try {
             //Validar que se hayan enviado todos los parametros
             $this->validate($request, [
-                'nombre' => 'required',            
+                'nombre' => 'required',
                 'documento' => 'required|integer',
                 'entregas' => 'required',
             ]);
@@ -160,7 +160,7 @@ class ClienteController extends Controller
                         $cliente = new Cliente();
                         $cliente->nombre = $request->nombre;
                         $cliente->documento = $request->documento;
-                        
+
 
                         //Hacer commit
                         $cliente->save();
@@ -203,7 +203,7 @@ class ClienteController extends Controller
                         'status' => 'false'
                     ]);
                 }
-           
+
         } catch (\Throwable $th) {
             //Hacer rollback
             DB::rollback();
@@ -222,14 +222,14 @@ class ClienteController extends Controller
         try {
             //Validar que se hayan enviado todos los parametros
             $this->validate($request, [
-                'nombre' => 'required',            
+                'nombre' => 'required',
                 'documento' => 'required|integer',
                 'entregas' => 'required',
                 'saldo_botellon' => 'required|integer',
                 'estado' => 'required',
                 'id' => 'required'
             ]);
-          
+
                 //validar que el documento ingresado sea un numero de 8 o 11 digitos
                 if ((strlen($request->documento) == 8 || strlen($request->documento) == 11)) {
                     DB::beginTransaction();
@@ -238,13 +238,13 @@ class ClienteController extends Controller
                         'documento' => 'unique:clientes,documento,' . $request->id,
                     ]);
                     $cliente = Cliente::find($request->id);
-                    //validar que no exista un cliente con dicho documento menos el que ya tiene asignado                                       
-                    //Desactivar autocommit                        
+                    //validar que no exista un cliente con dicho documento menos el que ya tiene asignado
+                    //Desactivar autocommit
                     $cliente->nombre = $request->nombre;
                     $cliente->documento = $request->documento;
                     $cliente->estado = $request->estado;
                     $cliente->saldo_botellon = $request->saldo_botellon;
-                    $cliente->save();                  
+                    $cliente->save();
                     //Obtener el json de entregas del cliente
                     $entregas = $request->entregas;
                     //convertir entregas en un array
@@ -258,7 +258,7 @@ class ClienteController extends Controller
                         $objentrega->zona_entrega = $entrega->zona_entrega;
                         $objentrega->direccion_entrega = $entrega->direccion_entrega;
                         $objentrega->save();
-                    }                                      
+                    }
                     DB::commit();
                     return response()->json([
                         'data' => [
@@ -273,7 +273,7 @@ class ClienteController extends Controller
                         ],
                         'status' => 'false'
                     ]);
-                }          
+                }
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([
@@ -284,8 +284,8 @@ class ClienteController extends Controller
             ]);
         }
     }
-    
-    
+
+
     public function eliminarClientes(Request $request){
         try {
             $request->validate([
@@ -299,7 +299,7 @@ class ClienteController extends Controller
                     'Cliente dado de baja correctamente'
                 ],
                 'status' => 'true'
-            ]);                    
+            ]);
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([
@@ -312,7 +312,7 @@ class ClienteController extends Controller
                 'status' => 'false'
             ]);
         }
-       
+
     }
 
     public function buscarClientePorId(Request $request){
@@ -321,23 +321,23 @@ class ClienteController extends Controller
                 'id' => 'required',
             ]);
             $cliente = Cliente::find($request->id);
-            $entregas = Entrega::where('cliente_id', $cliente->id)->get();
+            $cliente->entregas = Entrega::where('cliente_id', $cliente->id)->get();
             return response()->json([
-                'data' => [
-                    'cliente' => $cliente,
-                    'entregas' => $entregas
-                ],
+                'data' =>
+                     $cliente
+
+                ,
                 'status' => 'true'
             ]);
         } catch (\Throwable $th) {
             return response()->json([
-                'data' => [
+                'data' =>
                     $th->getMessage()
-                ],
+                ,
                 'status' => 'false'
             ]);
         }
-    }        
+    }
 
-  
+
 }
