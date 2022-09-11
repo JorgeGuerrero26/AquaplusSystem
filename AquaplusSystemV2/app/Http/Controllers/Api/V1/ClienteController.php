@@ -39,8 +39,7 @@ class ClienteController extends Controller
             if ($request->has('documento') && $request->get('documento')>0) {
                 //buscar clientesque tengan un documento parecido
                 $cliente = Cliente::where('documento', 'like', '%' . $request->documento . '%')->get();
-                //validar si existen clientes
-
+                //validar si existen clientes                                                                                      
                 if (count($cliente) > 0) {
                     //recorrer el cliente y sacar las entregas de cada uno
                     foreach ($cliente as $key => $value) {
@@ -228,6 +227,7 @@ class ClienteController extends Controller
                 'entregas' => 'required',
                 'saldo_botellon' => 'required|integer',
                 'estado' => 'required',
+                'id' => 'required'
             ]);
           
                 //validar que el documento ingresado sea un numero de 8 o 11 digitos
