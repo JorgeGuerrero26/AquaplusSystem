@@ -70,3 +70,4 @@ Route::post('buscarClientePorId','App\Http\Controllers\Api\V1\ClienteController@
 Route::post('buscarMaterialPorId','App\Http\Controllers\Api\V1\MaterialController@buscarMaterialPorId');
 Route::post('buscarUsuarioPorId','App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarioPorId');
 Route::post('buscarProveedorPorId','App\Http\Controllers\Api\V1\ProveedorController@buscarProveedorPorId');
+

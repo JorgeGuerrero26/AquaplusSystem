@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Venta;
 use App\Models\Detalle_venta;
 use App\Models\Cliente;
+use App\Models\Material;
 use App\Models\Usuario;
 
 use Illuminate\Support\Facades\DB;
@@ -38,6 +39,10 @@ class VentaController extends Controller
                     $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
                 }
                 $venta->total_venta = $total;
+                //Agregar el nombre del material
+                foreach ($venta->detalle_venta as $detalle) {
+                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                }
             }
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {
@@ -112,13 +117,20 @@ class VentaController extends Controller
     {
         try {
             $venta = Venta::find($request->id);
-            $venta->detalle_venta = Detalle_venta::where('venta_id', $request->id)->get();
+            $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();                
+            //Agregar el nombre del cliente y el nombre del usuario
+            $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+            $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
             //Calcular el total de la venta
             $total = 0;
             foreach ($venta->detalle_venta as $detalle) {
                 $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
             }
             $venta->total_venta = $total;
+            //Agregar el nombre del material
+            foreach ($venta->detalle_venta as $detalle) {
+                $detalle->material = Material::find($detalle->material_id)->descripcion;
+            }
             return response()->json(['data' => $venta, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -149,6 +161,13 @@ class VentaController extends Controller
                         $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
                     }
                     $venta->total_venta = $total;
+                    //Agregar el nombre del cliente y el nombre del usuario
+                    $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+                    $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+                    //Agregar el nombre del material
+                    foreach ($venta->detalle_venta as $detalle) {
+                        $detalle->material = Material::find($detalle->material_id)->descripcion;
+                    }
                 }
             } else {
                 $ventas = Venta::whereBetween('fecha', [$fecha_inicio, $fecha_fin])->get();
@@ -161,6 +180,13 @@ class VentaController extends Controller
                         $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
                     }
                     $venta->total_venta = $total;
+                    //Agregar el nombre del cliente y el nombre del usuario
+                    $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+                    $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+                    //Agregar el nombre del material
+                    foreach ($venta->detalle_venta as $detalle) {
+                        $detalle->material = Material::find($detalle->material_id)->descripcion;
+                    }
                 }
 
             }           
@@ -264,6 +290,15 @@ class VentaController extends Controller
                     $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
                 }
                 $venta->total_venta = $total;
+                //Agregar el nombre del usuario y el nombre del cliente
+                $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+                $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+                //Agregar el nombre del material
+                foreach ($venta->detalle_venta as $detalle) {
+                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                }
+
+
             }
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {

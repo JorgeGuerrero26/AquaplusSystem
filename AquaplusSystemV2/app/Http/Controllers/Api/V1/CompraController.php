@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Compra;
 use App\Models\Detalle_compra;
 use App\Models\Proveedor;
+use App\Models\Material;
 use App\Models\Usuario;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -33,7 +34,11 @@ class CompraController extends Controller
 
             foreach ($compras as $compra) {
                 $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-                //Calcular el total de la compra
+                //Agregar a cada detalle de compra el nombre del material
+                foreach ($compra->detalle_compra as $detalle) {
+                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                }                              
+                //Calcular el total de la compra                
                 $total = 0;
                 foreach ($compra->detalle_compra as $detalle) {
                     $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
@@ -119,6 +124,13 @@ class CompraController extends Controller
                 $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
             }
             $compra->total_compra = $total;
+            //Agregar el nombre del proveedor y el nombre del usuario
+            $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+            $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+            //Agregar a cada detalle de compra el nombre del material
+            foreach ($compra->detalle_compra as $detalle) {
+                $detalle->material = Material::find($detalle->material_id)->descripcion;
+            }
             return response()->json(['data' => $compra, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -143,6 +155,14 @@ class CompraController extends Controller
                     $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
                 }
                 $compra->total_compra = $total;
+                //Agregar el nombre del proveedor y el nombre del usuario
+                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+                //Agregar a cada detalle de compra el nombre del material
+                foreach ($compra->detalle_compra as $detalle) {
+                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                }
+
             }
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {
@@ -242,6 +262,14 @@ class CompraController extends Controller
                     $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
                 }
                 $compra->total_compra = $total;
+                //Agregar el nombre del proveedor y el usuario
+                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+                //Agregar el nombre del material
+                foreach ($compra->detalle_compra as $detalle) {
+                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                }                  
+
             }
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {
