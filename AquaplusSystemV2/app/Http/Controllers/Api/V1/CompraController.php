@@ -37,7 +37,7 @@ class CompraController extends Controller
                 //Agregar a cada detalle de compra el nombre del material
                 foreach ($compra->detalle_compra as $detalle) {
                     $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }                              
+                }
                 //Calcular el total de la compra                
                 $total = 0;
                 foreach ($compra->detalle_compra as $detalle) {
@@ -75,12 +75,28 @@ class CompraController extends Controller
             $compra = new Compra();
             $compra->fecha = $request->fecha;
             $compra->observacion = $request->observacion;
-           
+
             $compra->proveedor_id = $request->proveedor_id;
             $compra->usuario_id = $request->usuario_id;
             $compra->save();
             $detalle_compra = $request->detalle_compra;
             $detalle_compra = json_decode($detalle_compra);
+
+            foreach ($detalle_compra as $detalle) {
+                if ($detalle->material_id == '' || $detalle->cantidad_comprada == '' || $detalle->precio_unitario == '') {
+                    return response()->json(['data' => 'Debe llenar todos los campos del detalle de la compra', 'status' => 'false'], 500);
+                }
+            }
+
+            foreach ($detalle_compra as $detalle) {
+                if (!is_int($detalle->cantidad_comprada)) {
+                    return response()->json(['data' => 'La cantidad comprada debe ser un numero entero', 'status' => 'false'], 500);                                       
+                }               
+                if (!is_numeric($detalle->precio_unitario)) {
+                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);                                       
+                }
+            }
+
 
             //Recorrer cada detalle de la compra para insertarlo en la tabla detalle_compra
             foreach ($detalle_compra as $detalle) {
@@ -91,7 +107,7 @@ class CompraController extends Controller
                 $detalle_compra->precio_unitario = $detalle->precio_unitario;
                 $detalle_compra->save();
             }
-        
+
             DB::commit();
             return response()->json(['data' => 'Compra insertada correctamente', 'status' => 'true'], 200);
         } catch (\Exception $e) {
@@ -101,7 +117,6 @@ class CompraController extends Controller
             DB::rollback();
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
-
     }
 
     /**
@@ -111,7 +126,7 @@ class CompraController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function buscarCompras_Id(Request $request)
-    {        
+    {
         try {
             $request->validate([
                 'id' => 'required',
@@ -139,7 +154,8 @@ class CompraController extends Controller
         }
     }
 
-    public function buscarComprasPorFechas(Request $request){
+    public function buscarComprasPorFechas(Request $request)
+    {
         try {
             $request->validate([
                 'fecha_inicio' => 'required',
@@ -162,7 +178,6 @@ class CompraController extends Controller
                 foreach ($compra->detalle_compra as $detalle) {
                     $detalle->material = Material::find($detalle->material_id)->descripcion;
                 }
-
             }
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {
@@ -202,8 +217,25 @@ class CompraController extends Controller
             $compra->save();
             $detalle_compra = $request->detalle_compra;
             $detalle_compra = json_decode($detalle_compra);
+            //Recorrer el json de detalle_compra y validar que no existan valores vacios
+            foreach ($detalle_compra as $detalle) {
+                if ($detalle->material_id == '' || $detalle->cantidad_comprada == '' || $detalle->precio_unitario == '') {
+                    return response()->json(['data' => 'Debe llenar todos los campos del detalle de la compra', 'status' => 'false'], 500);
+                }
+            }
+
+            //Recorrer el json de detalle_compra y validar que cantidad_comprada sea un numero entero y precio unitario sea un numero
+            foreach ($detalle_compra as $detalle) {
+                if (!is_int($detalle->cantidad_comprada)) {
+                    return response()->json(['data' => 'La cantidad comprada debe ser un numero entero', 'status' => 'false'], 500);                                       
+                }               
+                if (!is_numeric($detalle->precio_unitario)) {
+                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);                                       
+                }
+            }
+
             //Recorrer cada detalle de la compra para actualizarlo en la tabla detalle_compra
-            Detalle_compra::where('compra_id',$compra->id)->delete();
+            Detalle_compra::where('compra_id', $compra->id)->delete();
             foreach ($detalle_compra as $detalle) {
                 $detalle_compra = new Detalle_compra();
                 $detalle_compra->compra_id = $compra->id;
@@ -247,7 +279,8 @@ class CompraController extends Controller
         }
     }
 
-    public function buscarComprasDeUnProveedor(Request $request){
+    public function buscarComprasDeUnProveedor(Request $request)
+    {
         try {
             $request->validate([
                 'proveedor_id' => 'required',
@@ -268,8 +301,7 @@ class CompraController extends Controller
                 //Agregar el nombre del material
                 foreach ($compra->detalle_compra as $detalle) {
                     $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }                  
-
+                }
             }
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {

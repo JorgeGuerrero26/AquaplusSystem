@@ -81,6 +81,24 @@ class VentaController extends Controller
             $venta->save();
             $detalle_venta = $request->detalle_venta;
             $detalle_venta = json_decode($detalle_venta);
+    
+
+            //Recorrer el json de detalle_Venta y validar que envie materiaul_id, que envie el precio_unitario y sea un numero, que envie la cantidad_entregada y sea un numero entero y que envie la cantidad recibida y sea un numero entero
+            foreach ($detalle_venta as $detalle) {
+                if (!is_numeric($detalle->material_id)) {
+                    return response()->json(['data' => 'El material id debe ser un numero', 'status' => 'false'], 500);
+                }
+                if (!is_numeric($detalle->precio_unitario)) {                    
+                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
+                }
+                if (!is_int($detalle->cantidad_entregada)) {
+                    //validar que la cantidad entregada sea un numero entero                    
+                    return response()->json(['data' => 'La cantidad entregada debe ser un numero entero', 'status' => 'false'], 500);
+                }
+                if (!is_int($detalle->cantidad_recibida)) {
+                    return response()->json(['data' => 'La cantidad recibida debe ser un numero entero', 'status' => 'false'], 500);
+                }            
+            }
 
             //Insertar el detalle de la venta        
             foreach ($detalle_venta as $detalle) {
@@ -228,6 +246,22 @@ class VentaController extends Controller
             $venta->save();
             $detalle_venta = $request->detalle_venta;
             $detalle_venta = json_decode($detalle_venta);
+            //Recorrer el json de detalle_venta y validar que no hayan valores vacios        
+            foreach ($detalle_venta as $detalle) {
+                if (!is_numeric($detalle->material_id)) {
+                    return response()->json(['data' => 'El material id debe ser un numero', 'status' => 'false'], 500);
+                }
+                if (!is_numeric($detalle->precio_unitario)) {                    
+                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
+                }
+                if (!is_int($detalle->cantidad_entregada)) {
+                    //validar que la cantidad entregada sea un numero entero                    
+                    return response()->json(['data' => 'La cantidad entregada debe ser un numero entero', 'status' => 'false'], 500);
+                }
+                if (!is_int($detalle->cantidad_recibida)) {
+                    return response()->json(['data' => 'La cantidad recibida debe ser un numero entero', 'status' => 'false'], 500);
+                }            
+            }
             //Eliminar el detalle de la venta
             Detalle_venta::where('venta_id', $venta->id)->delete();
             //Insertar el detalle de la venta        
