@@ -16,7 +16,7 @@ class ClienteController extends Controller
     {
         try {
             //Listar todos los clientes que su estado sea 1
-            $clientes = Cliente::where('estado',1)->get();
+            $clientes = Cliente::where('estado', 1)->get();
             //recorrer la lista y buscar sus entregas
             foreach ($clientes as $cliente) {
                 $cliente->entregas = Entrega::where('cliente_id', $cliente->id)->get();
@@ -36,7 +36,7 @@ class ClienteController extends Controller
     {
         //validar si ha traido documento y si tiene al menos un caracter
         try {
-            if ($request->has('documento') && $request->get('documento')>0) {
+            if ($request->has('documento') && $request->get('documento') > 0) {
                 //buscar clientesque tengan un documento parecido
                 $cliente = Cliente::where('documento', 'like', '%' . $request->documento . '%')->get();
                 //validar si existen clientes                                                                                      
@@ -53,7 +53,7 @@ class ClienteController extends Controller
                     ]);
                 } else {
                     //validar si envio el nombre
-                    if ($request->has('nombre') && $request->get('nombre')>0) {
+                    if ($request->has('nombre') && $request->get('nombre') > 0) {
                         //buscar clientes que tengan un nombre parecido
                         $cliente = Cliente::where('nombre', 'like', '%' . $request->nombre . '%')->get();
 
@@ -89,7 +89,7 @@ class ClienteController extends Controller
                 }
             } else {
                 //validar si envio el nombre
-                if ($request->has('nombre') && $request->get('nombre')>0) {
+                if ($request->has('nombre') && $request->get('nombre') > 0) {
                     $cliente = Cliente::where('nombre', 'like', '%' . $request->nombre . '%')->get();
                     //validar que haya retornado un cliente
                     if (count($cliente) > 0) {
@@ -100,7 +100,7 @@ class ClienteController extends Controller
                         }
                         return response()->json([
                             'data' =>
-                                $cliente,
+                            $cliente,
 
                             'status' => 'true'
                         ]);
@@ -114,15 +114,14 @@ class ClienteController extends Controller
                     }
                 } else {
                     //retornar todos los clientes con sus respectivas entregas
-                    $clientes = Cliente::where('estado',1)->get();
+                    $clientes = Cliente::where('estado', 1)->get();
                     //recorrer a los clientes para sacar sus entregas
                     foreach ($clientes as $cliente) {
                         $entregas = Entrega::where('cliente_id', $cliente->id)->get();
                         $cliente->entregas = $entregas;
                     }
                     return response()->json([
-                        'data' => $clientes
-                        ,
+                        'data' => $clientes,
                         'status' => 'true'
                     ]);
                 }
@@ -148,62 +147,74 @@ class ClienteController extends Controller
                 'entregas' => 'required',
             ]);
 
-                //validar que el documento ingresado sea un numero de 8 o 11 digitos
-                if ( (strlen($request->documento) == 8 || strlen($request->documento) == 11)) {
-                    //validar que no exista un cliente con dicho documento
-                    $cliente = Cliente::where('documento', $request->documento)->first();
-                    if (!$cliente) {
+            //validar que el documento ingresado sea un numero de 8 o 11 digitos
+            if ((strlen($request->documento) == 8 || strlen($request->documento) == 11)) {
+                //validar que no exista un cliente con dicho documento
+                $cliente = Cliente::where('documento', $request->documento)->first();
+                if (!$cliente) {
 
-                        //Desactivar autocommit
-                        DB::beginTransaction();
-                        //Empezar a captuarar los datos del cliente
-                        $cliente = new Cliente();
-                        $cliente->nombre = $request->nombre;
-                        $cliente->documento = $request->documento;
+                    //Desactivar autocommit
+                    DB::beginTransaction();
+                    //Empezar a captuarar los datos del cliente
+                    $cliente = new Cliente();
+                    $cliente->nombre = $request->nombre;
+                    $cliente->documento = $request->documento;
 
 
-                        //Hacer commit
-                        $cliente->save();
+                    //Hacer commit
+                    $cliente->save();
 
-                        //Obtener el json de entregas del cliente
-                        $entregas = $request->entregas;
+                    //Obtener el json de entregas del cliente
+                    $entregas = $request->entregas;
 
-                        //convertir entregas en un array
-                        $entregas = json_decode($entregas);
+                    //convertir entregas en un array
+                    $entregas = json_decode($entregas);
 
-                        //recorrer el json para inssertar en la tabla entregas
-                        foreach ($entregas as $entrega) {
-                            $objentrega = new Entrega();
-                            $objentrega->cliente_id = $cliente->id;
-                            $objentrega->zona_entrega = $entrega->zona_entrega;
-                            $objentrega->direccion_entrega = $entrega->direccion_entrega;
-                            $objentrega->save();
+                    //Recorrer el json de entregas y validar que todos los campos esten llenos
+                    foreach ($entregas as $entrega) {
+                        if ($entrega->zona_entrega == '' || $entrega->direccion_entrega == '') {
+                            return response()->json([
+                                'data' => [
+                                    'Faltan datos en las entregas'
+                                ],
+                                'status' => 'false'
+                            ]);
                         }
-                        //Activar autocommit
-                        DB::commit();
-                        return response()->json([
-                            'data' => [
-                                'Cliente insertado correctamente'
-                            ],
-                            'status' => 'true'
-                        ]);
-                    } else {
-                        return response()->json([
-                            'data' =>[
-                                'Cliente ya existe'
-                            ],
-                            'status' => 'false'
-                        ]);
                     }
+
+
+                    //recorrer el json para inssertar en la tabla entregas
+                    foreach ($entregas as $entrega) {
+                        $objentrega = new Entrega();
+                        $objentrega->cliente_id = $cliente->id;
+                        $objentrega->zona_entrega = $entrega->zona_entrega;
+                        $objentrega->direccion_entrega = $entrega->direccion_entrega;
+                        $objentrega->save();
+                    }
+                    //Activar autocommit
+                    DB::commit();
+                    return response()->json([
+                        'data' => [
+                            'Cliente insertado correctamente'
+                        ],
+                        'status' => 'true'
+                    ]);
                 } else {
                     return response()->json([
                         'data' => [
-                            'Documento invalido'
+                            'Cliente ya existe'
                         ],
                         'status' => 'false'
                     ]);
                 }
-
+            } else {
+                return response()->json([
+                    'data' => [
+                        'Documento invalido'
+                    ],
+                    'status' => 'false'
+                ]);
+            }
         } catch (\Throwable $th) {
             //Hacer rollback
             DB::rollback();
@@ -230,50 +241,64 @@ class ClienteController extends Controller
                 'id' => 'required'
             ]);
 
-                //validar que el documento ingresado sea un numero de 8 o 11 digitos
-                if ((strlen($request->documento) == 8 || strlen($request->documento) == 11)) {
-                    DB::beginTransaction();
-                    //Empezar a captuarar los datos del cliente
-                    $this->validate($request, [
-                        'documento' => 'unique:clientes,documento,' . $request->id,
-                    ]);
-                    $cliente = Cliente::find($request->id);
-                    //validar que no exista un cliente con dicho documento menos el que ya tiene asignado
-                    //Desactivar autocommit
-                    $cliente->nombre = $request->nombre;
-                    $cliente->documento = $request->documento;
-                    $cliente->estado = $request->estado;
-                    $cliente->saldo_botellon = $request->saldo_botellon;
-                    $cliente->save();
-                    //Obtener el json de entregas del cliente
-                    $entregas = $request->entregas;
-                    //convertir entregas en un array
-                    $entregas = json_decode($entregas);
-                    //Eliminar todas las entregas que tenga el cliente actualizado
-                    Entrega::where('cliente_id', $request->id)->delete();
-                    //recorrer el json para inssertar en la tabla entregas
-                    foreach ($entregas as $entrega) {
-                        $objentrega = new Entrega();
-                        $objentrega->cliente_id = $cliente->id;
-                        $objentrega->zona_entrega = $entrega->zona_entrega;
-                        $objentrega->direccion_entrega = $entrega->direccion_entrega;
-                        $objentrega->save();
+            //validar que el documento ingresado sea un numero de 8 o 11 digitos
+            if ((strlen($request->documento) == 8 || strlen($request->documento) == 11)) {
+                DB::beginTransaction();
+                //Empezar a captuarar los datos del cliente
+                $this->validate($request, [
+                    'documento' => 'unique:clientes,documento,' . $request->id,
+                ]);
+                $cliente = Cliente::find($request->id);
+                //validar que no exista un cliente con dicho documento menos el que ya tiene asignado
+                //Desactivar autocommit
+                $cliente->nombre = $request->nombre;
+                $cliente->documento = $request->documento;
+                $cliente->estado = $request->estado;
+                $cliente->saldo_botellon = $request->saldo_botellon;
+                $cliente->save();
+                //Obtener el json de entregas del cliente
+                $entregas = $request->entregas;
+                //convertir entregas en un array
+                $entregas = json_decode($entregas);
+
+                //Recorrer el json de entregas y validar que todos los campos esten llenos
+                foreach ($entregas as $entrega) {
+                    if ($entrega->zona_entrega == '' || $entrega->direccion_entrega == '') {
+                        return response()->json([
+                            'data' => [
+                                'Faltan datos en las entregas'
+                            ],
+                            'status' => 'false'
+                        ]);
                     }
-                    DB::commit();
-                    return response()->json([
-                        'data' => [
-                            'Cliente actualizado correctamente'
-                        ],
-                        'status' => 'true'
-                    ]);
-                } else {
-                    return response()->json([
-                        'data' => [
-                            'Documento invalido'
-                        ],
-                        'status' => 'false'
-                    ]);
                 }
+
+
+                //Eliminar todas las entregas que tenga el cliente actualizado
+                Entrega::where('cliente_id', $request->id)->delete();
+                //recorrer el json para inssertar en la tabla entregas
+                foreach ($entregas as $entrega) {
+                    $objentrega = new Entrega();
+                    $objentrega->cliente_id = $cliente->id;
+                    $objentrega->zona_entrega = $entrega->zona_entrega;
+                    $objentrega->direccion_entrega = $entrega->direccion_entrega;
+                    $objentrega->save();
+                }
+                DB::commit();
+                return response()->json([
+                    'data' => [
+                        'Cliente actualizado correctamente'
+                    ],
+                    'status' => 'true'
+                ]);
+            } else {
+                return response()->json([
+                    'data' => [
+                        'Documento invalido'
+                    ],
+                    'status' => 'false'
+                ]);
+            }
         } catch (\Throwable $th) {
             DB::rollback();
             return response()->json([
@@ -286,7 +311,8 @@ class ClienteController extends Controller
     }
 
 
-    public function eliminarClientes(Request $request){
+    public function eliminarClientes(Request $request)
+    {
         try {
             $request->validate([
                 'id' => 'required',
@@ -312,10 +338,10 @@ class ClienteController extends Controller
                 'status' => 'false'
             ]);
         }
-
     }
 
-    public function buscarClientePorId(Request $request){
+    public function buscarClientePorId(Request $request)
+    {
         try {
             $request->validate([
                 'id' => 'required',
@@ -324,20 +350,15 @@ class ClienteController extends Controller
             $cliente->entregas = Entrega::where('cliente_id', $cliente->id)->get();
             return response()->json([
                 'data' =>
-                     $cliente
-
-                ,
+                $cliente,
                 'status' => 'true'
             ]);
         } catch (\Throwable $th) {
             return response()->json([
                 'data' =>
-                    $th->getMessage()
-                ,
+                $th->getMessage(),
                 'status' => 'false'
             ]);
         }
     }
-
-
 }
