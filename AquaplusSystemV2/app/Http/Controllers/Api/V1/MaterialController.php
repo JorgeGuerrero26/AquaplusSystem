@@ -173,4 +173,20 @@ class MaterialController extends Controller
         }
     }
 
+    public function darDeAltaMaterial(Request $request){
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $material = Material::find($request->id);
+            $material->estado = 1;
+            $material->save();
+            return response()->json(['data' => 'Material dado de alta con exito', 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
 }

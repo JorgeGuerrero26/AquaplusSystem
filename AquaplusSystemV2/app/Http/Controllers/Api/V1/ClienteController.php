@@ -361,4 +361,30 @@ class ClienteController extends Controller
             ]);
         }
     }
+
+    public function darDeAltaCliente(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $cliente = Cliente::find($request->id);
+            $cliente->estado = 1;
+            $cliente->save();
+            return response()->json([
+                'data' => [
+                    'Cliente dado de alta correctamente'
+                ],
+                'status' => 'true'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => [
+                    $th->getMessage()
+                ],
+                'status' => 'false'
+            ]);
+        }
+    }
+
 }

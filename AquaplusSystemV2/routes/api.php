@@ -71,3 +71,8 @@ Route::post('buscarMaterialPorId','App\Http\Controllers\Api\V1\MaterialControlle
 Route::post('buscarUsuarioPorId','App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarioPorId');
 Route::post('buscarProveedorPorId','App\Http\Controllers\Api\V1\ProveedorController@buscarProveedorPorId');
 
+//DarDeAlta
+Route::post('darDeAltaCliente','App\Http\Controllers\Api\V1\ClienteController@darDeAltaCliente');
+Route::post('darDeAltaMaterial','App\Http\Controllers\Api\V1\MaterialController@darDeAltaMaterial');
+Route::post('darDeAltaUsuario','App\Http\Controllers\Api\V1\UsuarioController@darDeAltaUsuario');
+Route::post('darDeAltaProveedor','App\Http\Controllers\Api\V1\ProveedorController@darDeAltaProveedor');

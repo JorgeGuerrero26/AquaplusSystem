@@ -187,5 +187,21 @@ class UsuarioController extends Controller
             return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
         }
     }
+
+    public function darDeAltaUsuario(Request $request){
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $usuario = Usuario::find($request->id);
+            $usuario->estado = 1;
+            $usuario->save();
+            return response()->json(['data' => 'Usuario dado de alta con exito','status' => 'true'],200);         
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
+        }
+    }
        
 }
