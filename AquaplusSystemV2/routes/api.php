@@ -24,12 +24,20 @@ Route::get('/listarClientes','App\Http\Controllers\Api\V1\ClienteController@list
 Route::post('/insertarClientes','App\Http\Controllers\Api\V1\ClienteController@insertarClientes');
 Route::post('/actualizarClientes','App\Http\Controllers\Api\V1\ClienteController@actualizarClientes');
 Route::post('/eliminarClientes','App\Http\Controllers\Api\V1\ClienteController@eliminarClientes');
+Route::post('buscarClientePorId','App\Http\Controllers\Api\V1\ClienteController@buscarClientePorId');
+Route::post('darDeAltaCliente','App\Http\Controllers\Api\V1\ClienteController@darDeAltaCliente');
+    //21/09/2022
+Route::post('listarZonasDeUnClienteDadoSuId','App\Http\Controllers\Api\V1\ClienteController@listarZonasDeUnClienteDadoSuId');
+
 //Proveedores
 Route::get('/listarProveedores','App\Http\Controllers\Api\V1\ProveedorController@listarProveedores');
 Route::post('/insertarProveedores','App\Http\Controllers\Api\V1\ProveedorController@insertarProveedores');
 Route::post('/buscarProveedores','App\Http\Controllers\Api\V1\ProveedorController@buscarProveedores');
 Route::post('/actualizarProveedores','App\Http\Controllers\Api\V1\ProveedorController@actualizarProveedores');
 Route::post('/eliminarProveedores','App\Http\Controllers\Api\V1\ProveedorController@eliminarProveedores');
+Route::post('buscarProveedorPorId','App\Http\Controllers\Api\V1\ProveedorController@buscarProveedorPorId');
+Route::post('darDeAltaProveedor','App\Http\Controllers\Api\V1\ProveedorController@darDeAltaProveedor');
+
 //Usuarios (Esta por ver si usaremos estas rutas o las que nos proporciona laravel)
 Route::post('/buscarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarios');
 Route::get('/listarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@listarUsuarios');
@@ -37,6 +45,8 @@ Route::post('/insertarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@i
 Route::post('/actualizarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@actualizarUsuarios');
 Route::post('/eliminarUsuarios','App\Http\Controllers\Api\V1\UsuarioController@eliminarUsuarios');
 Route::post('/loginUsuario','App\Http\Controllers\Api\V1\UsuarioController@loginUsuario');
+Route::post('buscarUsuarioPorId','App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarioPorId');
+Route::post('darDeAltaUsuario','App\Http\Controllers\Api\V1\UsuarioController@darDeAltaUsuario');
 
 //Materiales
 Route::post('/buscarMateriales','App\Http\Controllers\Api\V1\MaterialController@buscarMateriales');
@@ -44,6 +54,8 @@ Route::get('/listarMateriales','App\Http\Controllers\Api\V1\MaterialController@l
 Route::post('/insertarMateriales','App\Http\Controllers\Api\V1\MaterialController@insertarMateriales');
 Route::post('/actualizarMateriales','App\Http\Controllers\Api\V1\MaterialController@actualizarMateriales');
 Route::post('/eliminarMateriales','App\Http\Controllers\Api\V1\MaterialController@eliminarMateriales');
+Route::post('buscarMaterialPorId','App\Http\Controllers\Api\V1\MaterialController@buscarMaterialPorId');
+Route::post('darDeAltaMaterial','App\Http\Controllers\Api\V1\MaterialController@darDeAltaMaterial');
 //Ventas
 Route::post('/buscarVentasPorFechas','App\Http\Controllers\Api\V1\VentaController@buscarVentasPorFechas');
 Route::get('/listarVentas','App\Http\Controllers\Api\V1\VentaController@listarVentas');
@@ -51,6 +63,7 @@ Route::post('/insertarVentas','App\Http\Controllers\Api\V1\VentaController@inser
 Route::post('/actualizarVentas','App\Http\Controllers\Api\V1\VentaController@actualizarVentas');
 Route::post('/eliminarVentas','App\Http\Controllers\Api\V1\VentaController@eliminarVentas');
 Route::post('/buscarVentas_Id','App\Http\Controllers\Api\V1\VentaController@buscarVentas_Id');
+Route::post('buscarVentasPorCliente','App\Http\Controllers\Api\V1\VentaController@buscarVentasDeUnCliente');
 //Compras
 Route::post('/buscarComprasPorFechas','App\Http\Controllers\Api\V1\CompraController@buscarComprasPorFechas');
 Route::get('/listarCompras','App\Http\Controllers\Api\V1\CompraController@listarCompras');
@@ -58,21 +71,14 @@ Route::post('/insertarCompras','App\Http\Controllers\Api\V1\CompraController@ins
 Route::post('/actualizarCompras','App\Http\Controllers\Api\V1\CompraController@actualizarCompras');
 Route::post('/eliminarCompras','App\Http\Controllers\Api\V1\CompraController@eliminarCompras');
 Route::post('/buscarCompras_Id','App\Http\Controllers\Api\V1\CompraController@buscarCompras_Id');
+Route::post('buscarComprasPorProveedor','App\Http\Controllers\Api\V1\CompraController@buscarComprasDeUnProveedor');
 
 //Nuevo
 Route::get('listarTiposUsuarios','App\Http\Controllers\Api\V1\UsuarioController@listarTiposUsuarios');
 Route::get('listarTiposMateriales','App\Http\Controllers\Api\V1\MaterialController@listarTiposMateriales');
-Route::post('buscarVentasPorCliente','App\Http\Controllers\Api\V1\VentaController@buscarVentasDeUnCliente');
-Route::post('buscarComprasPorProveedor','App\Http\Controllers\Api\V1\CompraController@buscarComprasDeUnProveedor');
 
-//Nuevo 20-08-2022
-Route::post('buscarClientePorId','App\Http\Controllers\Api\V1\ClienteController@buscarClientePorId');
-Route::post('buscarMaterialPorId','App\Http\Controllers\Api\V1\MaterialController@buscarMaterialPorId');
-Route::post('buscarUsuarioPorId','App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarioPorId');
-Route::post('buscarProveedorPorId','App\Http\Controllers\Api\V1\ProveedorController@buscarProveedorPorId');
 
-//DarDeAlta
-Route::post('darDeAltaCliente','App\Http\Controllers\Api\V1\ClienteController@darDeAltaCliente');
-Route::post('darDeAltaMaterial','App\Http\Controllers\Api\V1\MaterialController@darDeAltaMaterial');
-Route::post('darDeAltaUsuario','App\Http\Controllers\Api\V1\UsuarioController@darDeAltaUsuario');
-Route::post('darDeAltaProveedor','App\Http\Controllers\Api\V1\ProveedorController@darDeAltaProveedor');
+
+
+
+

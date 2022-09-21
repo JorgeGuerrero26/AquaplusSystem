@@ -387,4 +387,25 @@ class ClienteController extends Controller
         }
     }
 
+    public function listarZonasDeUnClienteDadoSuId(Request $request)
+    {
+        try {
+            $request->validate([
+                'id' => 'required',
+            ]);
+            $entregas = Entrega::where('cliente_id', $request->id)->get();
+            return response()->json([
+                'data' => $entregas,
+                'status' => 'true'
+            ]);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => [
+                    $th->getMessage()
+                ],
+                'status' => 'false'
+            ]);
+        }
+    }
+
 }
