@@ -96,7 +96,7 @@ class VentaController extends Controller
                     return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
                 }
                 if (!is_int($detalle->cantidad_entregada)) {
-                    //validar que la cantidad entregada sea un numero entero                    
+                    //validar que la cantidad entregada sea un numero entero
                     return response()->json(['data' => 'La cantidad entregada debe ser un numero entero', 'status' => 'false'], 500);
                 }
                 if (!is_int($detalle->cantidad_recibida)) {
@@ -104,7 +104,7 @@ class VentaController extends Controller
                 }
             }
 
-            //Insertar el detalle de la venta        
+            //Insertar el detalle de la venta
             foreach ($detalle_venta as $detalle) {
                 $objdetalle_venta = new Detalle_venta();
                 $objdetalle_venta->venta_id = $venta->id;
@@ -281,7 +281,7 @@ class VentaController extends Controller
             $venta->save();
             $detalle_venta = $request->detalle_venta;
             $detalle_venta = json_decode($detalle_venta);
-            //Recorrer el json de detalle_venta y validar que no hayan valores vacios        
+            //Recorrer el json de detalle_venta y validar que no hayan valores vacios
             foreach ($detalle_venta as $detalle) {
                 if (!is_numeric($detalle->material_id)) {
                     return response()->json(['data' => 'El material id debe ser un numero', 'status' => 'false'], 500);
@@ -290,7 +290,7 @@ class VentaController extends Controller
                     return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
                 }
                 if (!is_int($detalle->cantidad_entregada)) {
-                    //validar que la cantidad entregada sea un numero entero                    
+                    //validar que la cantidad entregada sea un numero entero
                     return response()->json(['data' => 'La cantidad entregada debe ser un numero entero', 'status' => 'false'], 500);
                 }
                 if (!is_int($detalle->cantidad_recibida)) {
@@ -299,7 +299,7 @@ class VentaController extends Controller
             }
             //Eliminar el detalle de la venta
             Detalle_venta::where('venta_id', $venta->id)->delete();
-            //Insertar el detalle de la venta        
+            //Insertar el detalle de la venta
             foreach ($detalle_venta as $detalle) {
                 $objdetalle_venta = new Detalle_venta();
                 $objdetalle_venta->venta_id = $venta->id;
@@ -347,28 +347,36 @@ class VentaController extends Controller
     {
         try {
             $request->validate([
-                'cliente_id' => 'required|integer',
+                'cliente_id' => 'nullable|integer',
             ]);
-            $ventas = Venta::where('cliente_id', $request->cliente_id)->get();
-            //Recorrer cada venta para obtener el detalle de la venta
-            foreach ($ventas as $venta) {
-                $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
-                //Calcular el total de la venta
-                $total = 0;
-                foreach ($venta->detalle_venta as $detalle) {
-                    $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
+            if ($request->has('cliente_id') && $request->get('cliente_id') > 0) {
+                $ventas = Venta::where('cliente_id', $request->cliente_id)->get();
+                //Recorrer cada venta para obtener el detalle de la venta
+                foreach ($ventas as $venta) {
+                    $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
+                    //Calcular el total de la venta
+                    $total = 0;
+                    foreach ($venta->detalle_venta as $detalle) {
+                        $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
+                    }
+                    $venta->total_venta = $total;
+                    //Agregar el nombre del usuario y el nombre del cliente
+                    $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+                    $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+                    //Agregar el nombre del material
+                    foreach ($venta->detalle_venta as $detalle) {
+                        $detalle->material = Material::find($detalle->material_id)->descripcion;
+                    }
+
+
                 }
-                $venta->total_venta = $total;
-                //Agregar el nombre del usuario y el nombre del cliente
-                $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
-                $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
-                $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
-                //Agregar el nombre del material
-                foreach ($venta->detalle_venta as $detalle) {
-                    $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }
+                return response()->json(['data' => $ventas, 'status' => 'true'], 200);
+            }else {
+                return $this->listarVentas();
             }
-            return response()->json(['data' => $ventas, 'status' => 'true'], 200);
+
+
+
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
