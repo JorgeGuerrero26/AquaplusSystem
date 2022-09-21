@@ -90,10 +90,10 @@ class CompraController extends Controller
 
             foreach ($detalle_compra as $detalle) {
                 if (!is_int($detalle->cantidad_comprada)) {
-                    return response()->json(['data' => 'La cantidad comprada debe ser un numero entero', 'status' => 'false'], 500);                                       
-                }               
+                    return response()->json(['data' => 'La cantidad comprada debe ser un numero entero', 'status' => 'false'], 500);
+                }
                 if (!is_numeric($detalle->precio_unitario)) {
-                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);                                       
+                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
                 }
             }
 
@@ -158,34 +158,87 @@ class CompraController extends Controller
     {
         try {
             $request->validate([
-                'fecha_inicio' => 'required',
-                'fecha_fin' => 'required',
+                'fecha_inicio' => 'nullable|date',
+                'fecha_fin' => 'nullable|date',
             ]);
-            $compras = Compra::whereBetween('fecha', [$request->fecha_inicio, $request->fecha_fin])->get();
-            //Recorrer cada compra para obtener el detalle de la compra
-            foreach ($compras as $compra) {
-                $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-                //Calcular el total de la compra
-                $total = 0;
-                foreach ($compra->detalle_compra as $detalle) {
-                    $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
+            $fecha_inicio = $request->fecha_inicio;
+            $fecha_fin = $request->fecha_fin;
+            //Validar si no se han enviado las fechas
+            if ($fecha_inicio == '' && $fecha_fin == '') {
+                //Traer todas las compras
+                $compras = Compra::all();
+                //Recorrer cada compra para obtener el detalle de la compra
+                foreach ($compras as $compra) {
+                    $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
+                    //Calcular el total de la compra
+                    $total = 0;
+                    foreach ($compra->detalle_compra as $detalle) {
+                        $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
+                    }
+                    $compra->total_compra = $total;
+                    //Agregar el nombre del proveedor y el nombre del usuario
+                    $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+                    $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+                    //Agregar a cada detalle de compra el nombre del material
+                    foreach ($compra->detalle_compra as $detalle) {
+                        $detalle->material = Material::find($detalle->material_id)->descripcion;
+                    }
                 }
-                $compra->total_compra = $total;
-                //Agregar el nombre del proveedor y el nombre del usuario
-                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
-                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
-                //Agregar a cada detalle de compra el nombre del material
-                foreach ($compra->detalle_compra as $detalle) {
-                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                return response()->json(['data' => $compras, 'status' => 'true'], 200);
+            } else {
+                //Validar si no se envio la fecha de fin
+                if ($fecha_fin == '') {
+                    //Darle el valor a la fecha fin de la ultima compra que se hizo
+                    $fecha_fin = Compra::orderBy('fecha', 'desc')->first()->fecha;
+                    return $this->buscarFechas($fecha_inicio, $fecha_fin);
+                } else {
+                    //Validar si no se envio la fecha de inicio
+                    if ($fecha_inicio == '') {
+                        //Darle el valor a la fecha de inicio de la primera compra que se hizo
+                        $fecha_inicio = Compra::orderBy('fecha', 'asc')->first()->fecha;
+                        return $this->buscarFechas($fecha_inicio, $fecha_fin);
+                    } else {
+                        //Validar si la fecha de inicio es mayor a la fecha de fin
+                        if ($fecha_inicio > $fecha_fin) {
+                            return response()->json(['data' => 'La fecha de inicio no puede ser mayor a la fecha de fin', 'status' => 'false'], 500);
+                        } else {
+                            return $this->buscarFechas($fecha_inicio, $fecha_fin);
+                        }
+                    }
                 }
             }
-            return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
     }
+
+    //Modularizando busqueda por fechas
+    public function buscarFechas($fecha_inicio, $fecha_fin)
+    {
+        $compras = Compra::whereBetween('fecha', [$fecha_inicio, $fecha_fin])->get();
+        //Recorrer cada compra para obtener el detalle de la compra
+        foreach ($compras as $compra) {
+            $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
+            //Calcular el total de la compra
+            $total = 0;
+            foreach ($compra->detalle_compra as $detalle) {
+                $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
+            }
+            $compra->total_compra = $total;
+            //Agregar el nombre del proveedor y el nombre del usuario
+            $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+            $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+            //Agregar a cada detalle de compra el nombre del material
+            foreach ($compra->detalle_compra as $detalle) {
+                $detalle->material = Material::find($detalle->material_id)->descripcion;
+            }
+        }
+        return response()->json(['data' => $compras, 'status' => 'true'], 200);
+    }
+
+
 
     /**
      * Update the specified resource in storage.
@@ -227,10 +280,10 @@ class CompraController extends Controller
             //Recorrer el json de detalle_compra y validar que cantidad_comprada sea un numero entero y precio unitario sea un numero
             foreach ($detalle_compra as $detalle) {
                 if (!is_int($detalle->cantidad_comprada)) {
-                    return response()->json(['data' => 'La cantidad comprada debe ser un numero entero', 'status' => 'false'], 500);                                       
-                }               
+                    return response()->json(['data' => 'La cantidad comprada debe ser un numero entero', 'status' => 'false'], 500);
+                }
                 if (!is_numeric($detalle->precio_unitario)) {
-                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);                                       
+                    return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
                 }
             }
 
@@ -283,9 +336,26 @@ class CompraController extends Controller
     {
         try {
             $request->validate([
-                'proveedor_id' => 'required',
+                'proveedor_id' => 'nullable|integer',
             ]);
-            $compras = Compra::where('proveedor_id', $request->proveedor_id)->get();
+            //Si no envia el id traer todas las compras
+            if ($request->proveedor_id == null) {
+                return $this->buscarCompras(null);
+            } else {
+                return $this->buscarCompras($request->proveedor_id);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
+    //Crear una funcion con parametro proveedor_id con valor 0 por defecto
+    public function buscarCompras($proveedor_id = null)
+    {
+        if ($proveedor_id == null) {
+            $compras = Compra::all();
             //Recorrer cada compra para obtener el detalle de la compra
             foreach ($compras as $compra) {
                 $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
@@ -304,10 +374,26 @@ class CompraController extends Controller
                 }
             }
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
-        } catch (\Exception $e) {
-            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
-        } catch (\Throwable $th) {
-            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        } else {
+            $compras = Compra::where('proveedor_id', $proveedor_id)->get();
+            //Recorrer cada compra para obtener el detalle de la compra
+            foreach ($compras as $compra) {
+                $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
+                //Calcular el total de la compra
+                $total = 0;
+                foreach ($compra->detalle_compra as $detalle) {
+                    $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
+                }
+                $compra->total_compra = $total;
+                //Agregar el nombre del proveedor y el usuario
+                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
+                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
+                //Agregar el nombre del material
+                foreach ($compra->detalle_compra as $detalle) {
+                    $detalle->material = Material::find($detalle->material_id)->descripcion;
+                }
+            }
+            return response()->json(['data' => $compras, 'status' => 'true'], 200);
         }
     }
 }

@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\Venta;
 use App\Models\Detalle_venta;
+use App\Models\Entrega;
 use App\Models\Cliente;
 use App\Models\Material;
 use App\Models\Usuario;
@@ -22,11 +23,12 @@ class VentaController extends Controller
     public function listarVentas()
     {
         try {
-            $ventas = Venta::all();           
+            $ventas = Venta::all();
             //Agregar el nombre del cliente y el nombre del usuario
             foreach ($ventas as $venta) {
                 $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
                 $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+                $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
             }
 
 
@@ -69,6 +71,7 @@ class VentaController extends Controller
                 'cliente_id' => 'required',
                 'usuario_id' => 'required',
                 'detalle_venta' => 'required',
+                'entrega_id' => 'required'
             ]);
             //Desactivar autocommit
             DB::beginTransaction();
@@ -78,17 +81,18 @@ class VentaController extends Controller
             $venta->numero_guia = $request->numero_guia;
             $venta->cliente_id = $request->cliente_id;
             $venta->usuario_id = $request->usuario_id;
+            $venta->entrega_id = $request->entrega_id;
             $venta->save();
             $detalle_venta = $request->detalle_venta;
             $detalle_venta = json_decode($detalle_venta);
-    
+
 
             //Recorrer el json de detalle_Venta y validar que envie materiaul_id, que envie el precio_unitario y sea un numero, que envie la cantidad_entregada y sea un numero entero y que envie la cantidad recibida y sea un numero entero
             foreach ($detalle_venta as $detalle) {
                 if (!is_numeric($detalle->material_id)) {
                     return response()->json(['data' => 'El material id debe ser un numero', 'status' => 'false'], 500);
                 }
-                if (!is_numeric($detalle->precio_unitario)) {                    
+                if (!is_numeric($detalle->precio_unitario)) {
                     return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
                 }
                 if (!is_int($detalle->cantidad_entregada)) {
@@ -97,7 +101,7 @@ class VentaController extends Controller
                 }
                 if (!is_int($detalle->cantidad_recibida)) {
                     return response()->json(['data' => 'La cantidad recibida debe ser un numero entero', 'status' => 'false'], 500);
-                }            
+                }
             }
 
             //Insertar el detalle de la venta        
@@ -135,10 +139,11 @@ class VentaController extends Controller
     {
         try {
             $venta = Venta::find($request->id);
-            $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();                
+            $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
             //Agregar el nombre del cliente y el nombre del usuario
             $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
             $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+            $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
             //Calcular el total de la venta
             $total = 0;
             foreach ($venta->detalle_venta as $detalle) {
@@ -182,32 +187,35 @@ class VentaController extends Controller
                     //Agregar el nombre del cliente y el nombre del usuario
                     $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
                     $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+                    $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
                     //Agregar el nombre del material
                     foreach ($venta->detalle_venta as $detalle) {
                         $detalle->material = Material::find($detalle->material_id)->descripcion;
                     }
                 }
             } else {
-                $ventas = Venta::whereBetween('fecha', [$fecha_inicio, $fecha_fin])->get();
-                //Recorrer cada venta para obtener el detalle de la venta
-                foreach ($ventas as $venta) {
-                    $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
-                    //Calcular el total de la venta
-                    $total = 0;
-                    foreach ($venta->detalle_venta as $detalle) {
-                        $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
+                if ($fecha_inicio == '') {
+                    //Validar que la fecha fin sea mayor a la fecha inicio
+                    if ($fecha_fin < $fecha_inicio) {
+                        return response()->json(['data' => 'La fecha final debe ser mayor a la fecha de inicio', 'status' => 'false'], 500);
                     }
-                    $venta->total_venta = $total;
-                    //Agregar el nombre del cliente y el nombre del usuario
-                    $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
-                    $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
-                    //Agregar el nombre del material
-                    foreach ($venta->detalle_venta as $detalle) {
-                        $detalle->material = Material::find($detalle->material_id)->descripcion;
+                    //Crear una fecha de inicio que sea igual a la fecha de la primera venta
+                    $fecha_inicio = Venta::orderBy('fecha', 'asc')->first()->fecha;
+                    return $this->buscarFechas($fecha_inicio, $fecha_fin);
+                } else {
+                    if ($fecha_fin == '') {
+                        //Crear una fecha de fin que sea igual a la fecha de la ultima venta
+                        $fecha_fin = Venta::orderBy('fecha', 'desc')->first()->fecha;
+                        return $this->buscarFechas($fecha_inicio, $fecha_fin);
+                    } else {
+                        //Validar que la fecha fin sea mayor a la fecha inicio
+                        if ($fecha_fin < $fecha_inicio) {
+                            return response()->json(['data' => 'La fecha final debe ser mayor a la fecha de inicio', 'status' => 'false'], 500);
+                        }                     
+                        return $this->buscarFechas($fecha_inicio, $fecha_fin);
                     }
                 }
-
-            }           
+            }
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -216,7 +224,33 @@ class VentaController extends Controller
         }
     }
 
-  
+    //Modularizando busqueda por fechas
+    public function buscarFechas($fecha_inicio, $fecha_fin)
+    {
+        $ventas = Venta::whereBetween('fecha', [$fecha_inicio, $fecha_fin])->get();
+        
+        //Recorrer cada venta para obtener el detalle de la venta
+        foreach ($ventas as $venta) {
+            $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
+            //Calcular el total de la venta
+            $total = 0;
+            foreach ($venta->detalle_venta as $detalle) {
+                $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
+            }
+            $venta->total_venta = $total;
+            //Agregar el nombre del cliente y el nombre del usuario
+            $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+            $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
+            $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
+            //Agregar el nombre del material
+            foreach ($venta->detalle_venta as $detalle) {
+                $detalle->material = Material::find($detalle->material_id)->descripcion;
+            }
+        }
+        return response()->json(['data' => $ventas, 'status' => 'true'], 200);
+    }
+
+
 
 
     /**
@@ -237,6 +271,7 @@ class VentaController extends Controller
                 'usuario_id' => 'required|integer',
                 'observacion' => 'nullable|string',
                 'detalle_venta' => 'required|string',
+                'entrega_id' => 'required|integer',
             ]);
             $venta = Venta::find($request->id);
             $venta->numero_guia = $request->numero_guia;
@@ -251,7 +286,7 @@ class VentaController extends Controller
                 if (!is_numeric($detalle->material_id)) {
                     return response()->json(['data' => 'El material id debe ser un numero', 'status' => 'false'], 500);
                 }
-                if (!is_numeric($detalle->precio_unitario)) {                    
+                if (!is_numeric($detalle->precio_unitario)) {
                     return response()->json(['data' => 'El precio unitario debe ser un numero', 'status' => 'false'], 500);
                 }
                 if (!is_int($detalle->cantidad_entregada)) {
@@ -260,7 +295,7 @@ class VentaController extends Controller
                 }
                 if (!is_int($detalle->cantidad_recibida)) {
                     return response()->json(['data' => 'La cantidad recibida debe ser un numero entero', 'status' => 'false'], 500);
-                }            
+                }
             }
             //Eliminar el detalle de la venta
             Detalle_venta::where('venta_id', $venta->id)->delete();
@@ -292,7 +327,7 @@ class VentaController extends Controller
      */
     public function eliminarVentas(Request $request)
     {
-        try {            
+        try {
             $request->validate([
                 'id' => 'required|integer',
             ]);
@@ -306,10 +341,10 @@ class VentaController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
-        
     }
 
-    public function buscarVentasDeUnCliente(Request $request){
+    public function buscarVentasDeUnCliente(Request $request)
+    {
         try {
             $request->validate([
                 'cliente_id' => 'required|integer',
@@ -327,12 +362,11 @@ class VentaController extends Controller
                 //Agregar el nombre del usuario y el nombre del cliente
                 $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
                 $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
+                $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
                 //Agregar el nombre del material
                 foreach ($venta->detalle_venta as $detalle) {
                     $detalle->material = Material::find($detalle->material_id)->descripcion;
                 }
-
-
             }
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {

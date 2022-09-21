@@ -20,9 +20,12 @@ return new class extends Migration
             $table->string('numero_guia')->nullable();
             $table->unsignedBigInteger('cliente_id');
             $table->unsignedBigInteger('usuario_id');            
+            $table->unsignedBigInteger('entrega_id');
             $table->timestamps();
             $table->foreign('cliente_id')->references('id')->on('clientes');
             $table->foreign('usuario_id')->references('id')->on('usuarios');
+            $table->foreign('entrega_id')->references('id')->on('entregas');
+
         });
     }
 
