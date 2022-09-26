@@ -18,8 +18,9 @@ class ClienteFactory extends Factory
     {
         return [
             'nombre' => $this->faker->name,
-            'documento' => $this->faker->unique()->numberBetween(100000000, 999999999),                    
-            'saldo_botellon' => $this->faker->numberBetween(0, 100),            
+            'documento' => $this->faker->unique()->numberBetween(100000000, 999999999),
+            'saldo_botellon' => $this->faker->numberBetween(0, 100),
+            'forma_pago' => $this->faker->randomElement(['EFECTIVO', 'CUENTA']),
         ];
     }
 }

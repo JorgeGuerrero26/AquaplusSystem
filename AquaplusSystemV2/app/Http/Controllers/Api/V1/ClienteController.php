@@ -39,7 +39,7 @@ class ClienteController extends Controller
             if ($request->has('documento') && $request->get('documento') > 0) {
                 //buscar clientesque tengan un documento parecido
                 $cliente = Cliente::where('documento', 'like', '%' . $request->documento . '%')->get();
-                //validar si existen clientes                                                                                      
+                //validar si existen clientes
                 if (count($cliente) > 0) {
                     //recorrer el cliente y sacar las entregas de cada uno
                     foreach ($cliente as $key => $value) {
@@ -145,6 +145,7 @@ class ClienteController extends Controller
                 'nombre' => 'required',
                 'documento' => 'required|integer',
                 'entregas' => 'required',
+                'forma_pago'=> 'required',
             ]);
 
             //validar que el documento ingresado sea un numero de 8 o 11 digitos
@@ -159,6 +160,7 @@ class ClienteController extends Controller
                     $cliente = new Cliente();
                     $cliente->nombre = $request->nombre;
                     $cliente->documento = $request->documento;
+                    $cliente->forma_pago = $request->forma_pago;
 
 
                     //Hacer commit
@@ -238,7 +240,8 @@ class ClienteController extends Controller
                 'entregas' => 'required',
                 'saldo_botellon' => 'required|integer',
                 'estado' => 'required',
-                'id' => 'required'
+                'id' => 'required',
+                'forma_pago' => 'required',
             ]);
 
             //validar que el documento ingresado sea un numero de 8 o 11 digitos
@@ -255,6 +258,7 @@ class ClienteController extends Controller
                 $cliente->documento = $request->documento;
                 $cliente->estado = $request->estado;
                 $cliente->saldo_botellon = $request->saldo_botellon;
+                $cliente->forma_pago = $request->forma_pago;
                 $cliente->save();
                 //Obtener el json de entregas del cliente
                 $entregas = $request->entregas;
