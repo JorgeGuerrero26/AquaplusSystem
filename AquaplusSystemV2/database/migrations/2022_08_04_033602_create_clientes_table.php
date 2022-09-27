@@ -16,7 +16,7 @@ return new class extends Migration
         Schema::create('clientes', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
-            $table->string('documento',11)->unique();
+            $table->string('documento',11);
             $table->string('forma_pago');
             $table->unsignedInteger('saldo_botellon')->default(0);
             $table->boolean('estado')->default(true);

@@ -17,11 +17,11 @@ class Detalle_ventaFactory extends Factory
     public function definition()
     {
         return [
-            'precio_unitario' => $this->faker->numberBetween(1, 10),
+            'precio_unitario' => $this->faker->numberBetween(6, 10),
             'cantidad_entregada' => $this->faker->numberBetween(20, 80),
             'cantidad_recibida' => $this->faker->numberBetween(20, 80),
-            'venta_id' => $this->faker->numberBetween(1, 10),
-            'material_id' => $this->faker->numberBetween(1, 10),                       
+            'venta_id' => $this->faker->numberBetween(1, 1000),
+            'material_id' => $this->faker->numberBetween(1, 3),                       
         ];
     }
 }

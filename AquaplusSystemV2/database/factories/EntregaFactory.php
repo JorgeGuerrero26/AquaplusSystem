@@ -19,7 +19,7 @@ class EntregaFactory extends Factory
         return [
             'zona_entrega' => $this->faker->word,
             'direccion_entrega' => $this->faker->address(),
-            'cliente_id' => $this->faker->numberBetween(1, 10),
+            'cliente_id' => $this->faker->numberBetween(1, 100),
         ];
     }
 }
