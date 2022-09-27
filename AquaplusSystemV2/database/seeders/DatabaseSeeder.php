@@ -21,7 +21,7 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
-        \App\Models\Cliente::factory(10)->create();
+/*         \App\Models\Cliente::factory(10)->create();
         \App\Models\Entrega::factory(10)->create();
         \App\Models\Proveedor::factory(10)->create();
         \App\Models\Tipo_usuario::factory(2)->create();
@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         \App\Models\Venta::factory(10)->create();
         \App\Models\Detalle_venta::factory(10)->create();
         \App\Models\Compra::factory(10)->create();
-        \App\Models\Detalle_compra::factory(10)->create();
+        \App\Models\Detalle_compra::factory(10)->create(); */
 
     }
 }
