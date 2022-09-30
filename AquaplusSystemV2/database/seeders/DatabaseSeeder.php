@@ -27,10 +27,10 @@ class DatabaseSeeder extends Seeder
         \App\Models\Tipo_usuario::factory(2)->create();
         \App\Models\Usuario::factory(10)->create();
         //\App\Models\Material::factory(10)->create();
-        \App\Models\Venta::factory(1000)->create();
-        \App\Models\Detalle_venta::factory(1000)->create();
-        \App\Models\Compra::factory(1000)->create();
-        \App\Models\Detalle_compra::factory(1000)->create(); 
+        \App\Models\Venta::factory(15000)->create();
+        \App\Models\Detalle_venta::factory(30000)->create();
+        \App\Models\Compra::factory(15000)->create();
+        \App\Models\Detalle_compra::factory(30000)->create(); 
 
     }
 }

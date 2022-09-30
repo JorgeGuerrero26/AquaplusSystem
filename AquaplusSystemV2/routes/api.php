@@ -81,5 +81,9 @@ Route::get('listarTiposMateriales','App\Http\Controllers\Api\V1\MaterialControll
 
 
 
+//ArreglarVentas
+Route::post('/arregalarVentas','App\Http\Controllers\Api\V1\VentaController@arregalarVentas');
+Route::post('/agregarDetallesAVentas','App\Http\Controllers\Api\V1\VentaController@agregarDetallesAVentas');
+
 
 

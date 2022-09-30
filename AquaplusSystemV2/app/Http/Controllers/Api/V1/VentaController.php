@@ -383,4 +383,56 @@ class VentaController extends Controller
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
     }
-}
+
+    public function arregalarVentas()
+    {
+        try {
+           //Hacer una consulta sql para obtener las fechas de las primeras ventas de cada cliente
+            $ventas = DB::select('SELECT cliente_id, MIN(fecha) as fecha FROM ventas GROUP BY cliente_id');
+
+            //Actualizar la cantidad_recibida de cada detalle de venta a 0 ubicando la fecha de la venta obtenida en la consulta anterior
+            foreach ($ventas as $venta) {
+                DB::update('UPDATE detalle_ventas SET cantidad_recibida = 0 WHERE venta_id IN (SELECT id FROM ventas WHERE cliente_id = ? AND fecha = ?)', [$venta->cliente_id, $venta->fecha]);                                
+            }       
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
+    public function agregarDetallesAVentas()
+    {
+        try {
+          //Buscar las ventas que no tienen detalle de venta y almacenarlos en un json
+            $ventas = DB::select('SELECT id FROM ventas WHERE id NOT IN (SELECT venta_id FROM detalle_ventas)');
+            //Recorrer cada venta y agregarle el detalle de venta con una cantidad_entregada aleatoria entre 20 y 60, con una cantidad recibida aleatoria entre 20 y 60, con un precio_unitario aleatorio entre 7 y 10 y con un material_id aleatorio entre 1,2 y 3
+            //Quitar el tiempo de ejecucion
+            set_time_limit(0);
+            //Realizar el seed en la BD en las ventas 
+
+            foreach ($ventas as $venta) {
+                $detalle_venta = new Detalle_venta();
+                $detalle_venta->venta_id = $venta->id;
+                $detalle_venta->material_id = rand(1,3);
+                $detalle_venta->precio_unitario = rand(7,10);
+                $detalle_venta->cantidad_entregada = rand(20,60);
+                $detalle_venta->cantidad_recibida = rand(20,60);
+                $detalle_venta->save();
+            }
+            //Volver a limitar el tiempo de ejecucion a 60 segundos
+            set_time_limit(60);
+    
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
+
+
+
+   }
+
+
