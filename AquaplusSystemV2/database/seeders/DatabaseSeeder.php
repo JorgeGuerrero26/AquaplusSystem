@@ -22,15 +22,15 @@ class DatabaseSeeder extends Seeder
         // ]);
 
        //\App\Models\Cliente::factory(10)->create();
-        \App\Models\Entrega::factory(100)->create();
+        //\App\Models\Entrega::factory(100)->create();
         //\App\Models\Proveedor::factory(10)->create();
-        \App\Models\Tipo_usuario::factory(2)->create();
-        \App\Models\Usuario::factory(10)->create();
+        //\App\Models\Tipo_usuario::factory(2)->create();
+        //\App\Models\Usuario::factory(10)->create();
         //\App\Models\Material::factory(10)->create();
-        \App\Models\Venta::factory(15000)->create();
-        \App\Models\Detalle_venta::factory(30000)->create();
-        \App\Models\Compra::factory(15000)->create();
-        \App\Models\Detalle_compra::factory(30000)->create(); 
+        //\App\Models\Venta::factory(200)->create();
+        //\App\Models\Detalle_venta::factory(250)->create();
+        \App\Models\Compra::factory(200)->create();
+        \App\Models\Detalle_compra::factory(250)->create(); 
 
     }
 }

@@ -18,33 +18,11 @@ class CompraController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    //Cambiado
     public function listarCompras()
     {
         try {
-            $compras = Compra::all();
-            //Agregar el nombre del proveedor y el nombre del usuario
-            foreach ($compras as $compra) {
-                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
-                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
-            }
-
-
-            //Recorrer cada compra para obtener el detalle de la compra
-
-
-            foreach ($compras as $compra) {
-                $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-                //Agregar a cada detalle de compra el nombre del material
-                foreach ($compra->detalle_compra as $detalle) {
-                    $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }
-                //Calcular el total de la compra                
-                $total = 0;
-                foreach ($compra->detalle_compra as $detalle) {
-                    $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
-                }
-                $compra->total_compra = $total;
-            }
+            $compras = DB::select('Select c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id');
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -154,6 +132,7 @@ class CompraController extends Controller
         }
     }
 
+    //Cambiado
     public function buscarComprasPorFechas(Request $request)
     {
         try {
@@ -165,26 +144,8 @@ class CompraController extends Controller
             $fecha_fin = $request->fecha_fin;
             //Validar si no se han enviado las fechas
             if ($fecha_inicio == '' && $fecha_fin == '') {
-                //Traer todas las compras
-                $compras = Compra::all();
-                //Recorrer cada compra para obtener el detalle de la compra
-                foreach ($compras as $compra) {
-                    $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-                    //Calcular el total de la compra
-                    $total = 0;
-                    foreach ($compra->detalle_compra as $detalle) {
-                        $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
-                    }
-                    $compra->total_compra = $total;
-                    //Agregar el nombre del proveedor y el nombre del usuario
-                    $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
-                    $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
-                    //Agregar a cada detalle de compra el nombre del material
-                    foreach ($compra->detalle_compra as $detalle) {
-                        $detalle->material = Material::find($detalle->material_id)->descripcion;
-                    }
-                }
-                return response()->json(['data' => $compras, 'status' => 'true'], 200);
+                //LLamar a la funcion listarCompras
+                return $this->listarCompras();
             } else {
                 //Validar si no se envio la fecha de fin
                 if ($fecha_fin == '') {
@@ -217,24 +178,7 @@ class CompraController extends Controller
     //Modularizando busqueda por fechas
     public function buscarFechas($fecha_inicio, $fecha_fin)
     {
-        $compras = Compra::whereBetween('fecha', [$fecha_inicio, $fecha_fin])->get();
-        //Recorrer cada compra para obtener el detalle de la compra
-        foreach ($compras as $compra) {
-            $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-            //Calcular el total de la compra
-            $total = 0;
-            foreach ($compra->detalle_compra as $detalle) {
-                $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
-            }
-            $compra->total_compra = $total;
-            //Agregar el nombre del proveedor y el nombre del usuario
-            $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
-            $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
-            //Agregar a cada detalle de compra el nombre del material
-            foreach ($compra->detalle_compra as $detalle) {
-                $detalle->material = Material::find($detalle->material_id)->descripcion;
-            }
-        }
+        $compras = DB::select('Select c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id where c.fecha between ? and ?', [$fecha_inicio, $fecha_fin]);
         return response()->json(['data' => $compras, 'status' => 'true'], 200);
     }
 
@@ -331,7 +275,7 @@ class CompraController extends Controller
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
     }
-
+    //Cambiado
     public function buscarComprasDeUnProveedor(Request $request)
     {
         try {
@@ -355,44 +299,11 @@ class CompraController extends Controller
     public function buscarCompras($proveedor_id = null)
     {
         if ($proveedor_id == null) {
-            $compras = Compra::all();
-            //Recorrer cada compra para obtener el detalle de la compra
-            foreach ($compras as $compra) {
-                $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-                //Calcular el total de la compra
-                $total = 0;
-                foreach ($compra->detalle_compra as $detalle) {
-                    $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
-                }
-                $compra->total_compra = $total;
-                //Agregar el nombre del proveedor y el usuario
-                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
-                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
-                //Agregar el nombre del material
-                foreach ($compra->detalle_compra as $detalle) {
-                    $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }
-            }
-            return response()->json(['data' => $compras, 'status' => 'true'], 200);
+                return $this->listarCompras();
+            
+           
         } else {
-            $compras = Compra::where('proveedor_id', $proveedor_id)->get();
-            //Recorrer cada compra para obtener el detalle de la compra
-            foreach ($compras as $compra) {
-                $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
-                //Calcular el total de la compra
-                $total = 0;
-                foreach ($compra->detalle_compra as $detalle) {
-                    $total += $detalle->precio_unitario * $detalle->cantidad_comprada;
-                }
-                $compra->total_compra = $total;
-                //Agregar el nombre del proveedor y el usuario
-                $compra->proveedor = Proveedor::find($compra->proveedor_id)->nombre;
-                $compra->usuario = Usuario::find($compra->usuario_id)->nombre;
-                //Agregar el nombre del material
-                foreach ($compra->detalle_compra as $detalle) {
-                    $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }
-            }
+            $compras = DB::select('Select c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id where c.proveedor_id = ?', [$proveedor_id]);
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         }
     }

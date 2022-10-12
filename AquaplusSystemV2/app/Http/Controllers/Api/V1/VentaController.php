@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
@@ -20,32 +19,12 @@ class VentaController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    //Cambiado
     public function listarVentas()
     {
         try {
-            $ventas = Venta::all();
-            //Agregar el nombre del cliente y el nombre del usuario
-            foreach ($ventas as $venta) {
-                $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
-                $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
-                $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
-            }
-
-
-            //Recorrer cada venta para obtener el detalle de la venta
-            foreach ($ventas as $venta) {
-                $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
-                //Calcular el total de la venta
-                $total = 0;
-                foreach ($venta->detalle_venta as $detalle) {
-                    $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
-                }
-                $venta->total_venta = $total;
-                //Agregar el nombre del material
-                foreach ($venta->detalle_venta as $detalle) {
-                    $detalle->material = Material::find($detalle->material_id)->descripcion;
-                }
-            }
+            //Traer las ultimas 100 ventas con todos los datos de las ventas ademas hacer inner join con cliente para saber el nombre del cliente, hacer inner join con usuario para saber el nombre del usuario y hacer inner join con entrega para saber la zona_entrega
+            $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id ORDER BY V.id DESC');                                                                  
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -162,6 +141,7 @@ class VentaController extends Controller
         }
     }
 
+    //Cambiado
     public function buscarVentasPorFechas(Request $request) //Preguntar si se deberia buscar tambien por cliente
     {
         try {
@@ -174,25 +154,7 @@ class VentaController extends Controller
             $fecha_fin = $request->fecha_fin;
             //Validar que haya enviado la fecha inicio y fecha fin y si no lo envió traer todas las fechas
             if ($fecha_inicio == '' && $fecha_fin == '') {
-                $ventas = Venta::all();
-                //Recorrer cada venta para obtener el detalle de la venta
-                foreach ($ventas as $venta) {
-                    $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
-                    //Calcular el total de la venta
-                    $total = 0;
-                    foreach ($venta->detalle_venta as $detalle) {
-                        $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
-                    }
-                    $venta->total_venta = $total;
-                    //Agregar el nombre del cliente y el nombre del usuario
-                    $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
-                    $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
-                    $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
-                    //Agregar el nombre del material
-                    foreach ($venta->detalle_venta as $detalle) {
-                        $detalle->material = Material::find($detalle->material_id)->descripcion;
-                    }
-                }
+                return $this->listarVentas();
             } else {
                 if ($fecha_inicio == '') {
                     //Validar que la fecha fin sea mayor a la fecha inicio
@@ -215,8 +177,7 @@ class VentaController extends Controller
                         return $this->buscarFechas($fecha_inicio, $fecha_fin);
                     }
                 }
-            }
-            return response()->json(['data' => $ventas, 'status' => 'true'], 200);
+            }            
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -227,26 +188,7 @@ class VentaController extends Controller
     //Modularizando busqueda por fechas
     public function buscarFechas($fecha_inicio, $fecha_fin)
     {
-        $ventas = Venta::whereBetween('fecha', [$fecha_inicio, $fecha_fin])->get();
-        
-        //Recorrer cada venta para obtener el detalle de la venta
-        foreach ($ventas as $venta) {
-            $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
-            //Calcular el total de la venta
-            $total = 0;
-            foreach ($venta->detalle_venta as $detalle) {
-                $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
-            }
-            $venta->total_venta = $total;
-            //Agregar el nombre del cliente y el nombre del usuario
-            $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
-            $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
-            $venta->entrega = Entrega::find($venta->entrega_id)->zona_entrega;
-            //Agregar el nombre del material
-            foreach ($venta->detalle_venta as $detalle) {
-                $detalle->material = Material::find($detalle->material_id)->descripcion;
-            }
-        }
+        $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.fecha BETWEEN ? AND ? ORDER BY V.id DESC', [$fecha_inicio, $fecha_fin]);                        
         return response()->json(['data' => $ventas, 'status' => 'true'], 200);
     }
 
@@ -343,6 +285,7 @@ class VentaController extends Controller
         }
     }
 
+    //Cambiado
     public function buscarVentasDeUnCliente(Request $request)
     {
         try {
@@ -350,39 +293,25 @@ class VentaController extends Controller
                 'cliente_id' => 'nullable|integer',
             ]);
             if ($request->has('cliente_id') && $request->get('cliente_id') > 0) {
-                $ventas = Venta::where('cliente_id', $request->cliente_id)->get();
-                //Recorrer cada venta para obtener el detalle de la venta
-                foreach ($ventas as $venta) {
-                    $venta->detalle_venta = Detalle_venta::where('venta_id', $venta->id)->get();
-                    //Calcular el total de la venta
-                    $total = 0;
-                    foreach ($venta->detalle_venta as $detalle) {
-                        $total += $detalle->precio_unitario * $detalle->cantidad_entregada;
-                    }
-                    $venta->total_venta = $total;
-                    //Agregar el nombre del usuario y el nombre del cliente
-                    $venta->usuario = Usuario::find($venta->usuario_id)->nombre;
-                    $venta->cliente = Cliente::find($venta->cliente_id)->nombre;
-                    //Agregar el nombre del material
-                    foreach ($venta->detalle_venta as $detalle) {
-                        $detalle->material = Material::find($detalle->material_id)->descripcion;
-                    }
-
-
-                }
+                $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.cliente_id = ?', [$request->cliente_id]);                                
                 return response()->json(['data' => $ventas, 'status' => 'true'], 200);
-            }else {
+            }else{
                 return $this->listarVentas();
             }
-
-
-
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
     }
+
+
+
+
+
+
+    //NO CONSIDERAR ESTAS FUNCIONES
+
 
     public function arregalarVentas()
     {
@@ -423,6 +352,53 @@ class VentaController extends Controller
             //Volver a limitar el tiempo de ejecucion a 60 segundos
             set_time_limit(60);
     
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
+
+    public function arreglarNegativos(){
+        try {
+            //Aumentar la memoria disponible
+            ini_set('memory_limit', '4096M');
+            //Desactivar el tiempo de ejecucion
+            set_time_limit(0);
+            //Hacer una consulta a la bd
+            $ventas = DB::select('select v.fecha,dv.id as key_venta,cliente_id,cantidad_recibida,SUM(cantidad_entregada-cantidad_recibida) OVER (partition by cliente_id order by v.fecha,dv.id) as saldo_botellon
+            from dbo.ventas V inner join dbo.detalle_ventas dv on V.id = dv.venta_id  
+            inner join dbo.clientes cl on cl.id = v.cliente_id
+            inner join dbo.materiales ma on ma.id = dv.material_id
+            group by 
+            dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada 
+            order by cliente_id,fecha');
+
+          
+
+            //Recorrar cada venta hasta encontrar una venta con saldo_botellon negativo
+            foreach ($ventas as $venta) {
+                if($venta->saldo_botellon < 0){
+                    //Reducir la cantidad_recibida en 15
+                    DB::update('UPDATE detalle_ventas SET cantidad_recibida = cantidad_recibida - 15 WHERE id = ?', [$venta->key_venta]);
+                    //Limpiar ram y memoria
+                    unset($venta);
+                    //Liberar ram 
+                    gc_collect_cycles();
+                    //llamar a la funcion cubrid_free_result($req) para liberar la memoria
+                    //Liberar memoria
+            
+                            
+
+                    //Volver a llamar a la funcion
+                    $this->arreglarNegativos();
+                }
+            }
+            //Retornar correccion exitosa
+            return response()->json(['data' => 'Correccion exitosa', 'status' => 'true'], 200);
+            
+            set_time_limit(60);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {

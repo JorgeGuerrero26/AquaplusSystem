@@ -17,7 +17,7 @@ class Detalle_compraFactory extends Factory
     public function definition()
     {
         return [
-            'compra_id' => $this->faker->numberBetween(1, 15000),
+            'compra_id' => $this->faker->numberBetween(1, 200),
             'material_id' => $this->faker->numberBetween(1, 3),
             'cantidad_comprada' => $this->faker->numberBetween(10, 50),
             'precio_unitario' => $this->faker->numberBetween(6, 10),

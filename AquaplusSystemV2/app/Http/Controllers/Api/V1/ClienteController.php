@@ -11,16 +11,12 @@ use Illuminate\Contracts\Validation\Rule;
 
 class ClienteController extends Controller
 {
-
+    //Cambiado
     public function listarClientes()
     {
         try {
             //Listar todos los clientes que su estado sea 1
             $clientes = Cliente::where('estado', 1)->get();
-            //recorrer la lista y buscar sus entregas
-            foreach ($clientes as $cliente) {
-                $cliente->entregas = Entrega::where('cliente_id', $cliente->id)->get();
-            }
             return response()->json(['data' => $clientes, 'status' => 'true'], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -32,6 +28,7 @@ class ClienteController extends Controller
         }
     }
 
+    //Cambiado
     public function buscarClientes(Request $request)
     {
         //validar si ha traido documento y si tiene al menos un caracter
@@ -40,86 +37,26 @@ class ClienteController extends Controller
                 //buscar clientesque tengan un documento parecido
                 $cliente = Cliente::where('documento', 'like', '%' . $request->documento . '%')->get();
                 //validar si existen clientes
-                if (count($cliente) > 0) {
-                    //recorrer el cliente y sacar las entregas de cada uno
-                    foreach ($cliente as $key => $value) {
-                        $entregas = Entrega::where('cliente_id', $value->id)->get();
-                        $cliente[$key]['entregas'] = $entregas;
-                    }
 
-                    return response()->json([
-                        'data' =>  $cliente,
-                        'status' => 'true'
-                    ]);
-                } else {
-                    //validar si envio el nombre
-                    if ($request->has('nombre') && $request->get('nombre') > 0) {
-                        //buscar clientes que tengan un nombre parecido
-                        $cliente = Cliente::where('nombre', 'like', '%' . $request->nombre . '%')->get();
-
-                        //validar que haya retornado un cliente
-                        if (count($cliente) > 0) {
-                            foreach ($cliente as $key => $value) {
-                                $entregas = Entrega::where('cliente_id', $value->id)->get();
-                                $cliente[$key]['entregas'] = $entregas;
-                            }
-
-                            return response()->json([
-                                'data' => [
-                                    'cliente' => $cliente,
-                                ],
-                                'status' => 'true'
-                            ]);
-                        } else {
-                            return response()->json([
-                                'data' => [
-                                    'Cliente no encontrado'
-                                ],
-                                'status' => 'false'
-                            ]);
-                        }
-                    } else {
-                        return response()->json([
-                            'data' => [
-                                'Cliente no encontrado'
-                            ],
-                            'status' => 'false'
-                        ]);
-                    }
-                }
+                return response()->json([
+                    'data' =>  $cliente,
+                    'status' => 'true'
+                ]);
             } else {
                 //validar si envio el nombre
                 if ($request->has('nombre') && $request->get('nombre') > 0) {
                     $cliente = Cliente::where('nombre', 'like', '%' . $request->nombre . '%')->get();
                     //validar que haya retornado un cliente
-                    if (count($cliente) > 0) {
-                        //recorrer la coleccion de clientes y sacar las entregas
-                        foreach ($cliente as $key => $value) {
-                            $entregas = Entrega::where('cliente_id', $value->id)->get();
-                            $cliente[$key]['entregas'] = $entregas;
-                        }
-                        return response()->json([
-                            'data' =>
-                            $cliente,
+                    return response()->json([
+                        'data' =>
+                        $cliente,
 
-                            'status' => 'true'
-                        ]);
-                    } else {
-                        return response()->json([
-                            'data' => [
-                                'Cliente no encontrado'
-                            ],
-                            'status' => 'false'
-                        ]);
-                    }
+                        'status' => 'true'
+                    ]);
                 } else {
                     //retornar todos los clientes con sus respectivas entregas
                     $clientes = Cliente::where('estado', 1)->get();
-                    //recorrer a los clientes para sacar sus entregas
-                    foreach ($clientes as $cliente) {
-                        $entregas = Entrega::where('cliente_id', $cliente->id)->get();
-                        $cliente->entregas = $entregas;
-                    }
+                    //recorrer a los clientes para sacar sus entregas                   
                     return response()->json([
                         'data' => $clientes,
                         'status' => 'true'
@@ -145,7 +82,7 @@ class ClienteController extends Controller
                 'nombre' => 'required',
                 'documento' => 'required|integer',
                 'entregas' => 'required',
-                'forma_pago'=> 'required',
+                'forma_pago' => 'required',
             ]);
 
             //validar que el documento ingresado sea un numero de 8 o 11 digitos
@@ -411,5 +348,4 @@ class ClienteController extends Controller
             ]);
         }
     }
-
 }
