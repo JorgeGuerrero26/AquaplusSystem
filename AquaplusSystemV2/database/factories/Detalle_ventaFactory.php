@@ -18,9 +18,9 @@ class Detalle_ventaFactory extends Factory
     {
         return [
             'precio_unitario' => $this->faker->numberBetween(6, 10),
-            'cantidad_entregada' => $this->faker->numberBetween(20, 60),
-            'cantidad_recibida' => $this->faker->numberBetween(20, 60),
-            'venta_id' => $this->faker->numberBetween(1, 3000),
+            'cantidad_entregada' => $this->faker->numberBetween(5, 15),
+            'cantidad_recibida' => $this->faker->numberBetween(5, 15),
+            'venta_id' => $this->faker->numberBetween(1, 15364),
             'material_id' => $this->faker->numberBetween(1, 3),                       
         ];
     }

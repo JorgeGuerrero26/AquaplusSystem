@@ -18,11 +18,11 @@ class VentaFactory extends Factory
     {
         return [
             'usuario_id' => $this->faker->numberBetween(1, 10),
-            'cliente_id' => $this->faker->numberBetween(1, 100),
-            'fecha' => $this->faker->dateTimeBetween('-5 years', 'now'),
+            'cliente_id' => $this->faker->numberBetween(1, 111),
+            'fecha' => $this->faker->dateTimeBetween('-7 years', 'now'),
             'observacion' => $this->faker->text(),
             'numero_guia' => $this->faker->text(),       
-            'entrega_id' => $this->faker->numberBetween(1, 10),
+            'entrega_id' => $this->faker->numberBetween(1, 200),
         ];
     }
 }
