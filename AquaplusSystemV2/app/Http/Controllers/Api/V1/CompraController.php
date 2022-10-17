@@ -123,6 +123,9 @@ class CompraController extends Controller
             //Agregar a cada detalle de compra el nombre del material
             foreach ($compra->detalle_compra as $detalle) {
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
+                $detalle->material_id = (int) $detalle->material_id;
+
+
             }
 
             $compra->proveedor_id =(int) $compra->proveedor_id;

@@ -132,6 +132,8 @@ class VentaController extends Controller
             //Agregar el nombre del material
             foreach ($venta->detalle_venta as $detalle) {
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
+                $detalle->material_id = (int) $detalle->material_id;
+
             }
 
             $venta->cliente_id = (int) $venta->cliente_id;
