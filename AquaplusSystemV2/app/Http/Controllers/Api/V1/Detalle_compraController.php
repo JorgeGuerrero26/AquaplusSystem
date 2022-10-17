@@ -36,7 +36,7 @@ class Detalle_compraController extends Controller
 
         //Retornar el detalle de compra con el total
         return response()->json([
-            'id_compra' => $request->id,
+            'id' => $request->id,
             'data' => $detalle_compra,
             'total_compra' => $total,
             'status' => 'true'
