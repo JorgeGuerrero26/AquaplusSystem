@@ -32,6 +32,7 @@ class Detalle_ventaController extends Controller
 
         //Retornar el detalle de venta con el total
         return response()->json([
+            'id_venta' => $request->id,
             'data' => $detalle_venta,
             'total_venta' => $total,
             'status' => 'true'

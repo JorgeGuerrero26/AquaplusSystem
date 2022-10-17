@@ -316,6 +316,7 @@ class VentaController extends Controller
     public function arregalarVentas()
     {
         try {
+            set_time_limit(0);
            //Hacer una consulta sql para obtener las fechas de las primeras ventas de cada cliente
             $ventas = DB::select('SELECT cliente_id, MIN(fecha) as fecha FROM ventas GROUP BY cliente_id');
 
@@ -345,8 +346,8 @@ class VentaController extends Controller
                 $detalle_venta->venta_id = $venta->id;
                 $detalle_venta->material_id = rand(1,3);
                 $detalle_venta->precio_unitario = rand(7,10);
-                $detalle_venta->cantidad_entregada = rand(20,60);
-                $detalle_venta->cantidad_recibida = rand(20,60);
+                $detalle_venta->cantidad_entregada = rand(1,5);
+                $detalle_venta->cantidad_recibida = rand(1,5);
                 $detalle_venta->save();
             }
             //Volver a limitar el tiempo de ejecucion a 60 segundos
@@ -381,23 +382,17 @@ class VentaController extends Controller
             foreach ($ventas as $venta) {
                 if($venta->saldo_botellon < 0){
                     //Reducir la cantidad_recibida en 15
-                    DB::update('UPDATE detalle_ventas SET cantidad_recibida = cantidad_recibida - 15 WHERE id = ?', [$venta->key_venta]);
+                    DB::update('UPDATE detalle_ventas SET cantidad_recibida = cantidad_recibida - 5 WHERE id = ?', [$venta->key_venta]);
                     //Limpiar ram y memoria
                     unset($venta);
                     //Liberar ram 
                     gc_collect_cycles();
                     //llamar a la funcion cubrid_free_result($req) para liberar la memoria
-                    //Liberar memoria
-            
-                            
-
+                    //Liberar memoria                                        
                     //Volver a llamar a la funcion
                     $this->arreglarNegativos();
                 }
-            }
-            //Retornar correccion exitosa
-            return response()->json(['data' => 'Correccion exitosa', 'status' => 'true'], 200);
-            
+            }                       
             set_time_limit(60);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);

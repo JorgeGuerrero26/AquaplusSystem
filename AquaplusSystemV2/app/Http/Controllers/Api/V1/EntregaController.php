@@ -15,7 +15,8 @@ class EntregaController extends Controller
      */
     public function buscarEntregasDeUnClienteDadoSuID(Request $request)
     {
+        
         $entregas = Entrega::where('cliente_id', $request->id)->get();
-        return response()->json(['data' => $entregas, 'status' => 'true'], 200);
+        return response()->json(['id_cliente'=> $request->id,'data' => $entregas, 'status' => 'true'], 200);
     }
 }
