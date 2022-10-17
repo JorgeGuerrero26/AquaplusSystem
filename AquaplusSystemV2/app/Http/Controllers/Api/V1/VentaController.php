@@ -24,7 +24,7 @@ class VentaController extends Controller
     {
         try {
             //Traer las ultimas 100 ventas con todos los datos de las ventas ademas hacer inner join con cliente para saber el nombre del cliente, hacer inner join con usuario para saber el nombre del usuario y hacer inner join con entrega para saber la zona_entrega
-            $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id ORDER BY V.id DESC');                                                                  
+            $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id ORDER BY V.id DESC');
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -133,6 +133,11 @@ class VentaController extends Controller
             foreach ($venta->detalle_venta as $detalle) {
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
             }
+
+            $venta->cliente_id = (int) $venta->cliente_id;
+            $venta->usuario_id = (int) $venta->usuario_id;
+            $venta->entrega_id = (int) $venta->entrega_id;
+
             return response()->json(['data' => $venta, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -173,11 +178,11 @@ class VentaController extends Controller
                         //Validar que la fecha fin sea mayor a la fecha inicio
                         if ($fecha_fin < $fecha_inicio) {
                             return response()->json(['data' => 'La fecha final debe ser mayor a la fecha de inicio', 'status' => 'false'], 500);
-                        }                     
+                        }
                         return $this->buscarFechas($fecha_inicio, $fecha_fin);
                     }
                 }
-            }            
+            }
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -188,7 +193,7 @@ class VentaController extends Controller
     //Modularizando busqueda por fechas
     public function buscarFechas($fecha_inicio, $fecha_fin)
     {
-        $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.fecha BETWEEN ? AND ? ORDER BY V.id DESC', [$fecha_inicio, $fecha_fin]);                        
+        $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.fecha BETWEEN ? AND ? ORDER BY V.id DESC', [$fecha_inicio, $fecha_fin]);
         return response()->json(['data' => $ventas, 'status' => 'true'], 200);
     }
 
@@ -293,7 +298,7 @@ class VentaController extends Controller
                 'cliente_id' => 'nullable|integer',
             ]);
             if ($request->has('cliente_id') && $request->get('cliente_id') > 0) {
-                $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.cliente_id = ?', [$request->cliente_id]);                                
+                $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.cliente_id = ?', [$request->cliente_id]);
                 return response()->json(['data' => $ventas, 'status' => 'true'], 200);
             }else{
                 return $this->listarVentas();
@@ -322,8 +327,8 @@ class VentaController extends Controller
 
             //Actualizar la cantidad_recibida de cada detalle de venta a 0 ubicando la fecha de la venta obtenida en la consulta anterior
             foreach ($ventas as $venta) {
-                DB::update('UPDATE detalle_ventas SET cantidad_recibida = 0 WHERE venta_id IN (SELECT id FROM ventas WHERE cliente_id = ? AND fecha = ?)', [$venta->cliente_id, $venta->fecha]);                                
-            }       
+                DB::update('UPDATE detalle_ventas SET cantidad_recibida = 0 WHERE venta_id IN (SELECT id FROM ventas WHERE cliente_id = ? AND fecha = ?)', [$venta->cliente_id, $venta->fecha]);
+            }
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -339,7 +344,7 @@ class VentaController extends Controller
             //Recorrer cada venta y agregarle el detalle de venta con una cantidad_entregada aleatoria entre 20 y 60, con una cantidad recibida aleatoria entre 20 y 60, con un precio_unitario aleatorio entre 7 y 10 y con un material_id aleatorio entre 1,2 y 3
             //Quitar el tiempo de ejecucion
             set_time_limit(0);
-            //Realizar el seed en la BD en las ventas 
+            //Realizar el seed en la BD en las ventas
 
             foreach ($ventas as $venta) {
                 $detalle_venta = new Detalle_venta();
@@ -352,7 +357,7 @@ class VentaController extends Controller
             }
             //Volver a limitar el tiempo de ejecucion a 60 segundos
             set_time_limit(60);
-    
+
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -369,14 +374,14 @@ class VentaController extends Controller
             set_time_limit(0);
             //Hacer una consulta a la bd
             $ventas = DB::select('select v.fecha,dv.id as key_venta,cliente_id,cantidad_recibida,SUM(cantidad_entregada-cantidad_recibida) OVER (partition by cliente_id order by v.fecha,dv.id) as saldo_botellon
-            from dbo.ventas V inner join dbo.detalle_ventas dv on V.id = dv.venta_id  
+            from dbo.ventas V inner join dbo.detalle_ventas dv on V.id = dv.venta_id
             inner join dbo.clientes cl on cl.id = v.cliente_id
             inner join dbo.materiales ma on ma.id = dv.material_id
-            group by 
-            dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada 
+            group by
+            dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada
             order by cliente_id,fecha');
 
-          
+
 
             //Recorrar cada venta hasta encontrar una venta con saldo_botellon negativo
             foreach ($ventas as $venta) {
@@ -385,14 +390,14 @@ class VentaController extends Controller
                     DB::update('UPDATE detalle_ventas SET cantidad_recibida = cantidad_recibida - 5 WHERE id = ?', [$venta->key_venta]);
                     //Limpiar ram y memoria
                     unset($venta);
-                    //Liberar ram 
+                    //Liberar ram
                     gc_collect_cycles();
                     //llamar a la funcion cubrid_free_result($req) para liberar la memoria
-                    //Liberar memoria                                        
+                    //Liberar memoria
                     //Volver a llamar a la funcion
                     $this->arreglarNegativos();
                 }
-            }                       
+            }
             set_time_limit(60);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);

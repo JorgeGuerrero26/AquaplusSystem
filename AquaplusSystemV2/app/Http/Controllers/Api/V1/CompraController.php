@@ -124,6 +124,9 @@ class CompraController extends Controller
             foreach ($compra->detalle_compra as $detalle) {
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
             }
+
+            $compra->proveedor_id =(int) $compra->proveedor_id;
+            $compra->usuario_id =(int) $compra->usuario_id;
             return response()->json(['data' => $compra, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -299,7 +302,7 @@ class CompraController extends Controller
     public function buscarCompras($proveedor_id = null)
     {
         if ($proveedor_id == null) {
-                return $this->listarCompras();                       
+                return $this->listarCompras();
         } else {
             $compras = DB::select('Select c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id where c.proveedor_id = ?', [$proveedor_id]);
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
