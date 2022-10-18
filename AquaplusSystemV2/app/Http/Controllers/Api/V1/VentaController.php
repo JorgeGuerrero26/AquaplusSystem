@@ -133,7 +133,14 @@ class VentaController extends Controller
             //Agregar el nombre del material
             foreach ($venta->detalle_venta as $detalle) {
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
+                $detalle->material_id = (int) $detalle->material_id;
+
             }
+
+            $venta->cliente_id = (int) $venta->cliente_id;
+            $venta->usuario_id = (int) $venta->usuario_id;
+            $venta->entrega_id = (int) $venta->entrega_id;
+
             return response()->json(['data' => $venta, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -340,7 +347,7 @@ class VentaController extends Controller
             //Recorrer cada venta y agregarle el detalle de venta con una cantidad_entregada aleatoria entre 20 y 60, con una cantidad recibida aleatoria entre 20 y 60, con un precio_unitario aleatorio entre 7 y 10 y con un material_id aleatorio entre 1,2 y 3
             //Quitar el tiempo de ejecucion
             set_time_limit(0);
-            //Realizar el seed en la BD en las ventas 
+            //Realizar el seed en la BD en las ventas
 
             foreach ($ventas as $venta) {
                 $detalle_venta = new Detalle_venta();
@@ -370,11 +377,11 @@ class VentaController extends Controller
             set_time_limit(0);
             //Hacer una consulta a la bd
             $ventas = DB::select('select v.fecha,dv.id as key_venta,cliente_id,cantidad_recibida,SUM(cantidad_entregada-cantidad_recibida) OVER (partition by cliente_id order by v.fecha,dv.id) as saldo_botellon
-            from dbo.ventas V inner join dbo.detalle_ventas dv on V.id = dv.venta_id  
+            from dbo.ventas V inner join dbo.detalle_ventas dv on V.id = dv.venta_id
             inner join dbo.clientes cl on cl.id = v.cliente_id
             inner join dbo.materiales ma on ma.id = dv.material_id
-            group by 
-            dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada 
+            group by
+            dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada
             order by cliente_id,fecha');
 
 
@@ -386,10 +393,10 @@ class VentaController extends Controller
                     DB::update('UPDATE detalle_ventas SET cantidad_recibida = cantidad_recibida - 5 WHERE id = ?', [$venta->key_venta]);
                     //Limpiar ram y memoria
                     unset($venta);
-                    //Liberar ram 
+                    //Liberar ram
                     gc_collect_cycles();
                     //llamar a la funcion cubrid_free_result($req) para liberar la memoria
-                    //Liberar memoria                                        
+                    //Liberar memoria
                     //Volver a llamar a la funcion
                     $this->arreglarNegativos();
                 }
