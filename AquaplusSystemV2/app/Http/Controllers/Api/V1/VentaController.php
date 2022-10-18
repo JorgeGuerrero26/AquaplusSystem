@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
@@ -24,7 +25,7 @@ class VentaController extends Controller
     {
         try {
             //Traer las ultimas 100 ventas con todos los datos de las ventas ademas hacer inner join con cliente para saber el nombre del cliente, hacer inner join con usuario para saber el nombre del usuario y hacer inner join con entrega para saber la zona_entrega
-            $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id ORDER BY V.id DESC');                                                                  
+            $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id ORDER BY V.id DESC');
             return response()->json(['data' => $ventas, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -173,11 +174,11 @@ class VentaController extends Controller
                         //Validar que la fecha fin sea mayor a la fecha inicio
                         if ($fecha_fin < $fecha_inicio) {
                             return response()->json(['data' => 'La fecha final debe ser mayor a la fecha de inicio', 'status' => 'false'], 500);
-                        }                     
+                        }
                         return $this->buscarFechas($fecha_inicio, $fecha_fin);
                     }
                 }
-            }            
+            }
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -188,7 +189,7 @@ class VentaController extends Controller
     //Modularizando busqueda por fechas
     public function buscarFechas($fecha_inicio, $fecha_fin)
     {
-        $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.fecha BETWEEN ? AND ? ORDER BY V.id DESC', [$fecha_inicio, $fecha_fin]);                        
+        $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.fecha BETWEEN ? AND ? ORDER BY V.id DESC', [$fecha_inicio, $fecha_fin]);
         return response()->json(['data' => $ventas, 'status' => 'true'], 200);
     }
 
@@ -293,9 +294,9 @@ class VentaController extends Controller
                 'cliente_id' => 'nullable|integer',
             ]);
             if ($request->has('cliente_id') && $request->get('cliente_id') > 0) {
-                $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.cliente_id = ?', [$request->cliente_id]);                                
+                $ventas = DB::select('SELECT TOP 100 V.*, C.nombre as cliente, U.nombre as usuario, E.zona_entrega FROM ventas V INNER JOIN clientes C ON V.cliente_id = C.id INNER JOIN usuarios U ON V.usuario_id = U.id INNER JOIN entregas E ON V.entrega_id = E.id WHERE V.cliente_id = ?', [$request->cliente_id]);
                 return response()->json(['data' => $ventas, 'status' => 'true'], 200);
-            }else{
+            } else {
                 return $this->listarVentas();
             }
         } catch (\Exception $e) {
@@ -317,13 +318,13 @@ class VentaController extends Controller
     {
         try {
             set_time_limit(0);
-           //Hacer una consulta sql para obtener las fechas de las primeras ventas de cada cliente
+            //Hacer una consulta sql para obtener las fechas de las primeras ventas de cada cliente
             $ventas = DB::select('SELECT cliente_id, MIN(fecha) as fecha FROM ventas GROUP BY cliente_id');
 
             //Actualizar la cantidad_recibida de cada detalle de venta a 0 ubicando la fecha de la venta obtenida en la consulta anterior
             foreach ($ventas as $venta) {
-                DB::update('UPDATE detalle_ventas SET cantidad_recibida = 0 WHERE venta_id IN (SELECT id FROM ventas WHERE cliente_id = ? AND fecha = ?)', [$venta->cliente_id, $venta->fecha]);                                
-            }       
+                DB::update('UPDATE detalle_ventas SET cantidad_recibida = 0 WHERE venta_id IN (SELECT id FROM ventas WHERE cliente_id = ? AND fecha = ?)', [$venta->cliente_id, $venta->fecha]);
+            }
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -334,7 +335,7 @@ class VentaController extends Controller
     public function agregarDetallesAVentas()
     {
         try {
-          //Buscar las ventas que no tienen detalle de venta y almacenarlos en un json
+            //Buscar las ventas que no tienen detalle de venta y almacenarlos en un json
             $ventas = DB::select('SELECT id FROM ventas WHERE id NOT IN (SELECT venta_id FROM detalle_ventas)');
             //Recorrer cada venta y agregarle el detalle de venta con una cantidad_entregada aleatoria entre 20 y 60, con una cantidad recibida aleatoria entre 20 y 60, con un precio_unitario aleatorio entre 7 y 10 y con un material_id aleatorio entre 1,2 y 3
             //Quitar el tiempo de ejecucion
@@ -344,15 +345,14 @@ class VentaController extends Controller
             foreach ($ventas as $venta) {
                 $detalle_venta = new Detalle_venta();
                 $detalle_venta->venta_id = $venta->id;
-                $detalle_venta->material_id = rand(1,3);
-                $detalle_venta->precio_unitario = rand(7,10);
-                $detalle_venta->cantidad_entregada = rand(1,5);
-                $detalle_venta->cantidad_recibida = rand(1,5);
+                $detalle_venta->material_id = rand(1, 3);
+                $detalle_venta->precio_unitario = rand(7, 10);
+                $detalle_venta->cantidad_entregada = rand(1, 5);
+                $detalle_venta->cantidad_recibida = rand(1, 5);
                 $detalle_venta->save();
             }
             //Volver a limitar el tiempo de ejecucion a 60 segundos
             set_time_limit(60);
-    
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
         } catch (\Throwable $th) {
@@ -361,7 +361,8 @@ class VentaController extends Controller
     }
 
 
-    public function arreglarNegativos(){
+    public function arreglarNegativos()
+    {
         try {
             //Aumentar la memoria disponible
             ini_set('memory_limit', '4096M');
@@ -376,11 +377,11 @@ class VentaController extends Controller
             dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada 
             order by cliente_id,fecha');
 
-          
+
 
             //Recorrar cada venta hasta encontrar una venta con saldo_botellon negativo
             foreach ($ventas as $venta) {
-                if($venta->saldo_botellon < 0){
+                if ($venta->saldo_botellon < 0) {
                     //Reducir la cantidad_recibida en 15
                     DB::update('UPDATE detalle_ventas SET cantidad_recibida = cantidad_recibida - 5 WHERE id = ?', [$venta->key_venta]);
                     //Limpiar ram y memoria
@@ -392,7 +393,7 @@ class VentaController extends Controller
                     //Volver a llamar a la funcion
                     $this->arreglarNegativos();
                 }
-            }                       
+            }
             set_time_limit(60);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -401,9 +402,95 @@ class VentaController extends Controller
         }
     }
 
+    public function agregarEntregasALosClientesQueNoTienen(){
+        try {
+            //Aumentar la memoria disponible
+            ini_set('memory_limit', '4096M');
+            //Desactivar el tiempo de ejecucion
+            set_time_limit(0);
+            //Hacer una consulta a la bd
+            $clientes = DB::select('SELECT id FROM clientes WHERE id NOT IN (SELECT cliente_id FROM entregas)');
+            //Recorrer cada cliente y agregarle una entrega con una fecha aleatoria entre 2019-01-01 y 2020-12-31
+            foreach ($clientes as $cliente) {
+                $entrega = new Entrega();
+                $entrega->cliente_id = $cliente->id;
+                $entrega->direccion_entrega = 'Calle 1 # 2 - 3';
+                $entrega->zona_entrega= 'Zona 1';            
+                $entrega->created_at =null;
+                $entrega->updated_at = null;
+                $entrega->save();
+            }
+            set_time_limit(60);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+    public function arreglarEntregasDeClientes()
+    {
+        try {
+            //Aumentar la memoria disponible
+            ini_set('memory_limit', '4096M');
+            //Desactivar el tiempo de ejecucion
+            set_time_limit(0);
+            //Hacer un for y recorrer las entregas de cada cliente
+
+            for ($i = 1; $i <= 100; $i++) {
+                //Hacer una consulta a la bd
+                $ventas = DB::select('select * from entregas where cliente_id = ?', [$i]);
+
+                //Almacenar la primera id en una variable y las demas id menos la primera id en un array
+                $id = $ventas[0]->id;   
+                $ids = array();
+                for ($j = 1; $j < count($ventas); $j++) {
+                    array_push($ids, $ventas[$j]->id);
+                }
+                
+                //Validar si tiene 2 entregas o mas
+                if (count($ids) > 0) {
+                    foreach ($ids as $id2) {
+                        DB::update('UPDATE ventas SET entrega_id = ? WHERE entrega_id = ?', [$id, $id2]);
+                        //Eliminar las entregas con las demas id
+                        DB::delete('DELETE FROM entregas WHERE id = ?', [$id2]);
+                    }            
+                }                                 
+            }
 
 
+            
+            set_time_limit(60);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
 
-   }
+    public function validarQueLaIdDeEntregaYLaIdDeClienteCorrespondan(){
+        try {
+            //Aumentar la memoria disponible
+            ini_set('memory_limit', '4096M');
+            //Desactivar el tiempo de ejecucion
+            set_time_limit(0);
+            //Hacer una consulta a la bd
+            $ventas = DB::select('select * from ventas');
+           
+            foreach ($ventas as $venta) {
+                //Validar que la entrega_id corresponda al cliente_id y si no corresponde colocar la que corresponda
+                $entrega = DB::select('select * from entregas where id = ?', [$venta->entrega_id]);
+                if ($entrega[0]->cliente_id != $venta->cliente_id) {
+                    $entrega2 = DB::select('select * from entregas where cliente_id = ?', [$venta->cliente_id]);
+                    DB::update('UPDATE ventas SET entrega_id = ? WHERE id = ?', [$entrega2[0]->id, $venta->id]);
+                }
+            }
+            set_time_limit(60);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
 
-
+    
+}

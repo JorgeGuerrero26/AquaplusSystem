@@ -94,5 +94,10 @@ Route::get('listarTiposMateriales','App\Http\Controllers\Api\V1\MaterialControll
 Route::post('/arregalarVentas','App\Http\Controllers\Api\V1\VentaController@arregalarVentas');
 Route::post('/agregarDetallesAVentas','App\Http\Controllers\Api\V1\VentaController@agregarDetallesAVentas');
 Route::post('/arreglarNegativos','App\Http\Controllers\Api\V1\VentaController@arreglarNegativos');
+Route::post('/agregarEntregasALosClientesQueNoTienen','App\Http\Controllers\Api\V1\VentaController@agregarEntregasALosClientesQueNoTienen');
+Route::post('/arreglarEntregasDeClientes','App\Http\Controllers\Api\V1\VentaController@arreglarEntregasDeClientes');
+Route::post('/validarQueLaIdDeEntregaYLaIdDeClienteCorrespondan','App\Http\Controllers\Api\V1\VentaController@validarQueLaIdDeEntregaYLaIdDeClienteCorrespondan');
+
+
 
 
