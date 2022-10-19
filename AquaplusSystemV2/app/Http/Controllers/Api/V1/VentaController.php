@@ -135,6 +135,15 @@ class VentaController extends Controller
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
                 $detalle->material_id = (int) $detalle->material_id;
 
+                //Convertir precio_unitario a float
+                //Convertir cantidad_entregada a int
+                //Convertir cantidad_recibida a int
+
+                $detalle->precio_unitario = (float) $detalle->precio_unitario;
+                $detalle->cantidad_entregada = (int) $detalle->cantidad_entregada;
+                $detalle->cantidad_recibida = (int) $detalle->cantidad_recibida;
+            
+
             }
 
             $venta->cliente_id = (int) $venta->cliente_id;
@@ -367,12 +376,14 @@ class VentaController extends Controller
         }
     }
 
+           
+
 
     public function arreglarNegativos()
     {
         try {
             //Aumentar la memoria disponible
-            ini_set('memory_limit', '4096M');
+            ini_set('memory_limit', '10240M');
             //Desactivar el tiempo de ejecucion
             set_time_limit(0);
             //Hacer una consulta a la bd
@@ -382,9 +393,7 @@ class VentaController extends Controller
             inner join dbo.materiales ma on ma.id = dv.material_id
             group by
             dv.id,v.entrega_id,cliente_id,dv.material_id,cl.documento,cantidad_entregada,cantidad_recibida,v.fecha,precio_unitario*cantidad_entregada
-            order by cliente_id,fecha');
-
-
+            order by cliente_id,fecha');            
 
             //Recorrar cada venta hasta encontrar una venta con saldo_botellon negativo
             foreach ($ventas as $venta) {
@@ -497,6 +506,51 @@ class VentaController extends Controller
         } catch (\Throwable $th) {
             return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
         }
+    }
+
+    public function calcularSaldoBotellonActual(){
+        try {
+            //Aumentar la memoria disponible
+            ini_set('memory_limit', '4096M');
+            //Desactivar el tiempo de ejecucion
+            set_time_limit(0);
+            //Hacer un for y recorrer las ventas de cada cliente
+
+            for ($i = 1; $i <= 100; $i++) {
+                //Hacer una consulta a la bd
+                $ventas = DB::select('select * from ventas where cliente_id = ?', [$i]);
+
+                //Recorrer las ventas de cada cliente
+                for ($j = 0; $j < count($ventas); $j++) {
+
+                    //Hacer un for con los detalles de ventas de cada venta, sumar todos los botellones entregados y restar los botellones recibidos
+
+                    $detalles = DB::select('select * from detalle_ventas where venta_id = ?', [$ventas[$j]->id]);
+
+                    $botellonesEntregados = 0;
+
+                    $botellonesRecibidos = 0;
+
+                    for ($k = 0; $k < count($detalles); $k++) {
+                        $botellonesEntregados += $detalles[$k]->botellones_entregados;
+                        $botellonesRecibidos += $detalles[$k]->botellones_recibidos;
+                    }                    
+
+                    $saldoBotellonActual = $botellonesEntregados - $botellonesRecibidos;
+                    //Actualizar el saldo de botellon actual de cada cliente
+                    DB::update('UPDATE clientes SET saldo_botellon = ? WHERE id = ?', [$saldoBotellonActual, $i]);
+                }                                          
+            }
+
+
+            
+            set_time_limit(60);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+
     }
 
     

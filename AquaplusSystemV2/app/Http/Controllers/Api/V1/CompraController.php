@@ -125,6 +125,11 @@ class CompraController extends Controller
                 $detalle->material = Material::find($detalle->material_id)->descripcion;
                 $detalle->material_id = (int) $detalle->material_id;
 
+                $detalle->cantidad_comprada = (int) $detalle->cantidad_comprada;
+                $detalle->precio_unitario = (float) $detalle->precio_unitario;
+                // Convertir compra_id a entero
+                $detalle->compra_id = (int) $detalle->compra_id;
+
 
             }
 
