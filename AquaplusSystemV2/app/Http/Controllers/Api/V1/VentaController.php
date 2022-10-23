@@ -226,6 +226,7 @@ class VentaController extends Controller
             $request->validate([
                 'id' => 'required|integer',
                 'numero_guia' => 'required|string',
+                'fecha'=> 'required|date',
                 'cliente_id' => 'required|integer',
                 'usuario_id' => 'required|integer',
                 'observacion' => 'nullable|string',
@@ -234,9 +235,11 @@ class VentaController extends Controller
             ]);
             $venta = Venta::find($request->id);
             $venta->numero_guia = $request->numero_guia;
+            $venta->fecha = $request->fecha;
             $venta->cliente_id = $request->cliente_id;
             $venta->usuario_id = $request->usuario_id;
             $venta->observacion = $request->observacion;
+            $venta->entrega_id = $request->entrega_id;
             $venta->save();
             $detalle_venta = $request->detalle_venta;
             $detalle_venta = json_decode($detalle_venta);
