@@ -22,9 +22,23 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('/register', 'App\Http\Controllers\Api\V1\AuthController@register');
 Route::post('/login', 'App\Http\Controllers\Api\V1\AuthController@login');
 
+
+
+
 Route::middleware(['auth:sanctum'])->group(function () {
+
     Route::post('/logout', 'App\Http\Controllers\Api\V1\AuthController@logout');
-    
+
+    //Emtregas
+
+    Route::get('/listarEntregas', 'App\Http\Controllers\Api\V1\EntregaController@listarEntregas');
+    Route::post('/insertarEntregas', 'App\Http\Controllers\Api\V1\EntregaController@insertarEntregas');
+    Route::post('/buscarEntregaPorID', 'App\Http\Controllers\Api\V1\EntregaController@buscarEntregaPorID');
+    Route::post('/actualizarEntregas', 'App\Http\Controllers\Api\V1\EntregaController@actualizarEntregas');
+    Route::post('/eliminarEntregas', 'App\Http\Controllers\Api\V1\EntregaController@eliminarEntregas');
+    Route::post('/buscarEntregaPorZonaODireccion', 'App\Http\Controllers\Api\V1\EntregaController@buscarEntregaPorZonaODireccion');
+
+
     Route::get('/listarClientes', 'App\Http\Controllers\Api\V1\ClienteController@listarClientes');
     //Clientes
     Route::post('/buscarClientes', 'App\Http\Controllers\Api\V1\ClienteController@buscarClientes');

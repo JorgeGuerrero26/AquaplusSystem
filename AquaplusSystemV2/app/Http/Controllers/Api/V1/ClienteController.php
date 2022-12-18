@@ -173,8 +173,7 @@ class ClienteController extends Controller
             //Validar que se hayan enviado todos los parametros
             $this->validate($request, [
                 'nombre' => 'required',
-                'documento' => 'required|integer',
-                'entregas' => 'required',
+                'documento' => 'required|integer',                
                 'saldo_botellon' => 'required|integer',
                 'estado' => 'required',
                 'id' => 'required',
@@ -197,7 +196,7 @@ class ClienteController extends Controller
                 $cliente->saldo_botellon = $request->saldo_botellon;
                 $cliente->forma_pago = $request->forma_pago;
                 $cliente->save();
-                //Obtener el json de entregas del cliente
+/*                 //Obtener el json de entregas del cliente
                 $entregas = $request->entregas;
                 //convertir entregas en un array
                 $entregas = json_decode($entregas);
@@ -213,8 +212,7 @@ class ClienteController extends Controller
                         ]);
                     }
                 }
-
-
+                                
                 //Eliminar todas las entregas que tenga el cliente actualizado
                 Entrega::where('cliente_id', $request->id)->delete();
                 //recorrer el json para inssertar en la tabla entregas
@@ -224,7 +222,8 @@ class ClienteController extends Controller
                     $objentrega->zona_entrega = $entrega->zona_entrega;
                     $objentrega->direccion_entrega = $entrega->direccion_entrega;
                     $objentrega->save();
-                }
+                } */
+
                 DB::commit();
                 return response()->json([
                     'data' => [

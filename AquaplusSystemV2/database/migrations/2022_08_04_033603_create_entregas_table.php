@@ -17,7 +17,7 @@ return new class extends Migration
             $table->id();
             $table->string('zona_entrega');
             $table->string('direccion_entrega');
-            $table->unsignedBigInteger('cliente_id');
+            $table->unsignedBigInteger('cliente_id');            
             $table->timestamps();
             $table->foreign('cliente_id')->references('id')->on('clientes');
         });
