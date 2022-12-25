@@ -14,9 +14,22 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-});
+
+
+
+
+Route::middleware('auth:sanctum')->get('/user', 
+function (Request $request) {
+    //Retornar un json con data:true
+    return response()->json(['data' => true], 200); 
+}
+);
+
+
+
+
+
+
 
 //Usuarios
 Route::post('/register', 'App\Http\Controllers\Api\V1\AuthController@register');
