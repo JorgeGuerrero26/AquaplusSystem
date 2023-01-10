@@ -50,6 +50,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/actualizarEntregas', 'App\Http\Controllers\Api\V1\EntregaController@actualizarEntregas');
     Route::post('/eliminarEntregas', 'App\Http\Controllers\Api\V1\EntregaController@eliminarEntregas');
     Route::post('/buscarEntregaPorZonaODireccion', 'App\Http\Controllers\Api\V1\EntregaController@buscarEntregaPorZonaODireccion');
+    Route::post('/darDeAltaEntregas', 'App\Http\Controllers\Api\V1\EntregaController@darDeAltaEntregas');
+    Route::get('/listarEntregasConEstado0', 'App\Http\Controllers\Api\V1\EntregaController@listarEntregasConEstado0');
 
 
     Route::get('/listarClientes', 'App\Http\Controllers\Api\V1\ClienteController@listarClientes');
@@ -61,6 +63,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/eliminarClientes', 'App\Http\Controllers\Api\V1\ClienteController@eliminarClientes');
     Route::post('buscarClientePorId', 'App\Http\Controllers\Api\V1\ClienteController@buscarClientePorId');
     Route::post('darDeAltaCliente', 'App\Http\Controllers\Api\V1\ClienteController@darDeAltaCliente');
+    Route::get('listarClientesConEstado0', 'App\Http\Controllers\Api\V1\ClienteController@listarClientesConEstado0');
     //21/09/2022
     Route::post('listarZonasDeUnClienteDadoSuId', 'App\Http\Controllers\Api\V1\ClienteController@listarZonasDeUnClienteDadoSuId');
 
@@ -72,6 +75,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/eliminarProveedores', 'App\Http\Controllers\Api\V1\ProveedorController@eliminarProveedores');
     Route::post('buscarProveedorPorId', 'App\Http\Controllers\Api\V1\ProveedorController@buscarProveedorPorId');
     Route::post('darDeAltaProveedor', 'App\Http\Controllers\Api\V1\ProveedorController@darDeAltaProveedor');
+    Route::get('listarProveedoresConEstado0', 'App\Http\Controllers\Api\V1\ProveedorController@listarProveedoresConEstado0');
 
     //Usuarios (Esta por ver si usaremos estas rutas o las que nos proporciona laravel)
     Route::post('/buscarUsuarios', 'App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarios');
@@ -82,6 +86,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/loginUsuario', 'App\Http\Controllers\Api\V1\UsuarioController@loginUsuario');
     Route::post('buscarUsuarioPorId', 'App\Http\Controllers\Api\V1\UsuarioController@buscarUsuarioPorId');
     Route::post('darDeAltaUsuario', 'App\Http\Controllers\Api\V1\UsuarioController@darDeAltaUsuario');
+    Route::get('listarUsuariosEstado0', 'App\Http\Controllers\Api\V1\UsuarioController@listarUsuariosEstado0');
 
     //Materiales
     Route::post('/buscarMateriales', 'App\Http\Controllers\Api\V1\MaterialController@buscarMateriales');
@@ -91,6 +96,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/eliminarMateriales', 'App\Http\Controllers\Api\V1\MaterialController@eliminarMateriales');
     Route::post('buscarMaterialPorId', 'App\Http\Controllers\Api\V1\MaterialController@buscarMaterialPorId');
     Route::post('darDeAltaMaterial', 'App\Http\Controllers\Api\V1\MaterialController@darDeAltaMaterial');
+    Route::get('listarMaterialesConEstado0', 'App\Http\Controllers\Api\V1\MaterialController@listarMaterialesConEstado0');
     //Ventas
     Route::post('/buscarVentasPorFechas', 'App\Http\Controllers\Api\V1\VentaController@buscarVentasPorFechas');
     Route::get('/listarVentas', 'App\Http\Controllers\Api\V1\VentaController@listarVentas');

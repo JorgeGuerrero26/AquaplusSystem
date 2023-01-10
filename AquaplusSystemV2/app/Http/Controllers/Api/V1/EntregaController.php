@@ -33,6 +33,14 @@ class EntregaController extends Controller
         return response()->json(['data' => $entregas, 'status' => 'true'], 200);
     }
 
+    //Listar entregas con estado 0
+
+    public function listarEntregasConEstado0()
+    {
+        $entregas = BD::SELECT('SELECT e.*,c.nombre as cliente FROM entregas e inner join clientes c on c.id = e.cliente_id WHERE e.estado = 0 order by 1 desc');     
+        return response()->json(['data' => $entregas, 'status' => 'true'], 200);
+    }
+
     //Insertar una nueva entrega
 
     public function insertarEntregas(Request $request)

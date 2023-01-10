@@ -23,6 +23,22 @@ class ProveedorController extends Controller
         }
     }
 
+    //Listar Proveedores con estado 0
+
+    public function listarProveedoresConEstado0()
+    {
+        try {
+            //Listar proveedores que esten activos
+            $proveedores = Proveedor::where('estado', 0)->get();
+
+            return response()->json(['data' => $proveedores, 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *

@@ -34,6 +34,35 @@ class UsuarioController extends Controller
         }
     }
 
+    //Listar Usuario con estado 0
+
+ 
+    public function listarUsuariosEstado0()
+    {
+        try {
+            
+
+
+            $usuarios = DB::select('select id,nombre,email,clave,tipo_usuario_id as tipo_usuario,tipo_usuario_id,estado,created_at,updated_at from usuarios where estado = 0');
+            //Agregar la descripcion del tipo de usuario_id
+            foreach ($usuarios as $usuario) {
+                $usuario->tipo_usuario = Tipo_usuario::find($usuario->tipo_usuario)->descripcion;
+            }                 
+        
+            
+           
+
+            return response()->json(['data' => $usuarios,'status' => 'true'],200);            
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(),'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(),'status' => 'false'], 500);
+        }
+    }
+
+
+
+
 
     public function insertarUsuarios(Request $request)
     {

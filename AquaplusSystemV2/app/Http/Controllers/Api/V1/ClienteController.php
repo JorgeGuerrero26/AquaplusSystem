@@ -28,6 +28,24 @@ class ClienteController extends Controller
         }
     }
 
+    //Listar clientes con estado 0
+
+    public function listarClientesConEstado0()
+    {
+        try {
+            //Listar todos los clientes que su estado sea 0
+            $clientes = Cliente::where('estado', 0)->get();
+            return response()->json(['data' => $clientes, 'status' => 'true'], 200);
+        } catch (\Throwable $th) {
+            return response()->json([
+                'data' => [
+                    $th->getMessage()
+                ],
+                'status' => 'false'
+            ]);
+        }
+    }
+
     //Cambiado
     public function buscarClientes(Request $request)
     {

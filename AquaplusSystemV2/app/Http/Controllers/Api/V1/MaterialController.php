@@ -27,6 +27,21 @@ class MaterialController extends Controller
         }
     }
 
+    //ListarMaterialesConEstado0
+
+    public function listarMaterialesConEstado0()
+    {
+        try {
+            //Listar materiales que esten activos
+            $materiales = Material::where('estado',0)->get();
+            return response()->json(['data' => $materiales, 'status' => 'true'], 200);
+        } catch (\Exception $e) {
+            return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
+        } catch (\Throwable $th) {
+            return response()->json(['data' => $th->getMessage(), 'status' => 'false'], 500);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *
