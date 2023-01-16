@@ -178,7 +178,7 @@ class EntregaController extends Controller
         try {
 
             $this->validate($request, [
-                'id' => 'required',
+                'id' => 'required|numeric',
             ]);
 
             $entrega = Entrega::find($request->id);
@@ -188,6 +188,14 @@ class EntregaController extends Controller
             $cliente = Cliente::find($entrega->cliente_id);
 
             $entrega->cliente = $cliente->nombre;
+
+            //Cambiar el cliente_id a entero
+
+            $entrega->cliente_id = (int)$entrega->cliente_id;
+
+            //El estado tambien
+
+            $entrega->estado = (int)$entrega->estado;
 
             return response()->json([
                 'data' => $entrega,
