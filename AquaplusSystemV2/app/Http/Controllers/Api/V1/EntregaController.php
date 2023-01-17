@@ -233,6 +233,13 @@ class EntregaController extends Controller
                 $entrega = Entrega::all();
             }
 
+            //Sacar el nombre del cliente
+
+            foreach ($entrega as $key => $value) {
+                $cliente = Cliente::find($value->cliente_id);
+                $value->cliente = $cliente->nombre;
+            }
+                       
             return response()->json([
                 'data' => $entrega,
                 'status' => 'true'
@@ -247,6 +254,8 @@ class EntregaController extends Controller
             ]);
         }
     }
+
+
 
  
 
