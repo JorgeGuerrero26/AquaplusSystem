@@ -19,6 +19,11 @@ class EntregaController extends Controller
     {
         
         $entregas = Entrega::where('cliente_id', $request->id)->get();
+        //Hacer un for y buscar el nombre del cliente
+        foreach ($entregas as $entrega) {
+            $cliente = Cliente::find($entrega->cliente_id);
+            $entrega->cliente = $cliente->nombre;
+        }
         
 
 

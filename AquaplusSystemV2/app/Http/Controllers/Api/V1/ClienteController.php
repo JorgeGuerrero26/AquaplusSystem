@@ -352,10 +352,21 @@ class ClienteController extends Controller
                 'id' => 'required',
             ]);
             $entregas = Entrega::where('cliente_id', $request->id)->get();
+            //Sacer el nombre del cliente y agregarlo al array de entregas
+            $cliente = Cliente::find($request->id);
+            $entregas->cliente = $cliente->nombre;
             return response()->json([
                 'data' => $entregas,
                 'status' => 'true'
             ]);
+
+            
+
+            
+
+
+
+
         } catch (\Throwable $th) {
             return response()->json([
                 'data' => [
