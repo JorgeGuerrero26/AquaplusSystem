@@ -7,6 +7,7 @@ use App\Models\Usuario;
 use App\Models\Tipo_usuario;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UsuarioController extends Controller
 {
@@ -140,7 +141,13 @@ class UsuarioController extends Controller
                 'clave' => 'required',
             ]);
             $usuario = Usuario::find($request->id);
-            $usuario->update($request->all());
+            $usuario->tipo_usuario_id = $request->tipo_usuario_id;
+            $usuario->nombre = $request->nombre;
+            $usuario->email = $request->email;
+            $usuario->clave = Hash::make($request->clave);
+            $usuario->estado = $request->estado;
+            $usuario->save();
+
 
             return response()->json(['data' =>'Usuario actualizado con exito','status' => 'true'],200);            
         } catch (\Exception $e) {
