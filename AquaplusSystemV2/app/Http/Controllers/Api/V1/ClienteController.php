@@ -16,7 +16,9 @@ class ClienteController extends Controller
     {
         try {
             //Listar todos los clientes que su estado sea 1
-            $clientes = Cliente::where('estado', 1)->get();
+            $clientes = Cliente::where('estado', 1)
+            ->orderBy('id', 'desc')
+            ->get();
             return response()->json(['data' => $clientes, 'status' => 'true'], 200);
         } catch (\Throwable $th) {
             return response()->json([

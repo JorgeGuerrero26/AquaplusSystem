@@ -13,7 +13,9 @@ class ProveedorController extends Controller
     {
         try {
             //Listar proveedores que esten activos
-            $proveedores = Proveedor::where('estado', 1)->get();
+            $proveedores = Proveedor::where('estado', 1)
+            ->orderBy('id', 'desc')
+            ->get();
 
             return response()->json(['data' => $proveedores, 'status' => 'true'], 200);
         } catch (\Exception $e) {
@@ -85,20 +87,23 @@ class ProveedorController extends Controller
             //Si envio el ruc buscar por los que se parezcan a ese ruc, si envio el nombre buscar  por los que se parezcan a ese nombre y si no envio nada buscar todos
             if ($request->ruc) {
                 //Buscar ruc parecidos
-                $proveedores = Proveedor::where('ruc', 'like', '%' . $request->ruc . '%')->get();
+                $proveedores = Proveedor::where('ruc', 'like', '%' . $request->ruc . '%')->orderBy('id', 'desc')
+                ->get();
                 //Si no lo encuentra
                 if (count($proveedores) == 0) {
                     return response()->json(['data' => 'No se encontraron proveedores', 'status' => 'false'], 404);
                 }
             } elseif ($request->nombre) {
                 //Buscar nombres parecidos
-                $proveedores = Proveedor::where('nombre', 'like', '%' . $request->nombre . '%')->get();
+                $proveedores = Proveedor::where('nombre', 'like', '%' . $request->nombre . '%')->orderBy('id', 'desc')
+                ->get();
                 //Si no lo encuentra
                 if (count($proveedores) == 0) {
                     return response()->json(['data' => 'No se encontraron proveedores', 'status' => 'false'], 404);
                 }
             } else {
-                $proveedores = Proveedor::where('estado', 1)->get();
+                $proveedores = Proveedor::where('estado', 1)->orderBy('id', 'desc')
+                ->get();
             }
             return response()->json(['data' => $proveedores, 'status' => 'true'], 200);
         } catch (\Exception $e) {

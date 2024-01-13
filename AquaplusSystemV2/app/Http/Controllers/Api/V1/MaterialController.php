@@ -18,7 +18,8 @@ class MaterialController extends Controller
     {
         try {
             //Listar materiales que esten activos
-            $materiales = Material::where('estado',1)->get();
+            $materiales = Material::where('estado',1)->orderBy('id', 'desc')
+            ->get();
             return response()->json(['data' => $materiales, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -33,7 +34,8 @@ class MaterialController extends Controller
     {
         try {
             //Listar materiales que esten activos
-            $materiales = Material::where('estado',0)->get();
+            $materiales = Material::where('estado',0)->orderBy('id', 'desc')
+            ->get();
             return response()->json(['data' => $materiales, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -88,13 +90,15 @@ class MaterialController extends Controller
             //Si trajo el nombre buscar nombres parecidos, si no traer a todos los materiales
             if ($request->descripcion) {
                 //Buscar nombres parecidos
-                $materiales = Material::where('descripcion', 'like', '%' . $request->descripcion . '%')->get();
+                $materiales = Material::where('descripcion', 'like', '%' . $request->descripcion . '%')->orderBy('id', 'desc')
+                ->get();
                 //si no lo encuentra
                 if (count($materiales) == 0) {
                     return response()->json(['data' => 'No se encontraron materiales', 'status' => 'false'], 404);
                 }
             } else {
-                $materiales = Material::where('estado',1)->get();
+                $materiales = Material::where('estado',1)->orderBy('id', 'desc')
+                ->get();
             }
             return response()->json(['data' => $materiales, 'status' => 'true'], 200);
         } catch (\Throwable $th) {

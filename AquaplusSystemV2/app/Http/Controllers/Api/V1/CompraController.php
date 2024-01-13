@@ -22,7 +22,7 @@ class CompraController extends Controller
     public function listarCompras()
     {
         try {
-            $compras = DB::select('Select  top 100 c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id order by 1 desc');
+            $compras = DB::select('Select  c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id order by 1 desc LIMIT 100');
             return response()->json(['data' => $compras, 'status' => 'true'], 200);
         } catch (\Exception $e) {
             return response()->json(['data' => $e->getMessage(), 'status' => 'false'], 500);
@@ -110,7 +110,8 @@ class CompraController extends Controller
                 'id' => 'required',
             ]);
             $compra = Compra::find($request->id);
-            $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->get();
+            $compra->detalle_compra = Detalle_compra::where('compra_id', $compra->id)->orderBy('id', 'desc')
+            ->get();
             //Calcular el total de la compra
             $total = 0;
             foreach ($compra->detalle_compra as $detalle) {
@@ -189,7 +190,7 @@ class CompraController extends Controller
     //Modularizando busqueda por fechas
     public function buscarFechas($fecha_inicio, $fecha_fin)
     {
-        $compras = DB::select('Select c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id where c.fecha between ? and ?', [$fecha_inicio, $fecha_fin]);
+        $compras = DB::select('Select c.*,p.nombre as proveedor, u.nombre as usuario from compras c inner join proveedores p on c.proveedor_id = p.id inner join usuarios u on c.usuario_id = u.id where c.fecha between ? and ? order by id desc', [$fecha_inicio, $fecha_fin]);
         return response()->json(['data' => $compras, 'status' => 'true'], 200);
     }
 

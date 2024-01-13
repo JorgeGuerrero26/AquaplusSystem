@@ -18,7 +18,7 @@ class VentaFactory extends Factory
     {
         return [
             'usuario_id' => $this->faker->numberBetween(1, 10),
-            'cliente_id' => $this->faker->numberBetween(1, 111),
+            'cliente_id' => $this->faker->numberBetween(1, 10),
             'fecha' => $this->faker->dateTimeBetween('-7 years', 'now'),
             'observacion' => $this->faker->text(),
             'numero_guia' => $this->faker->text(),       

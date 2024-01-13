@@ -19,7 +19,7 @@ class CompraFactory extends Factory
         return [
             'fecha' => $this->faker->dateTimeBetween('-7 years', 'now'),
             'observacion' => $this->faker->text,           
-            'proveedor_id' => $this->faker->numberBetween(1, 252),
+            'proveedor_id' => $this->faker->numberBetween(1, 10),
             'usuario_id' => $this->faker->numberBetween(1, 10),                 
         ];
     }

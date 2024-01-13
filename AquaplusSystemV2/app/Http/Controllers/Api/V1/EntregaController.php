@@ -17,17 +17,21 @@ class EntregaController extends Controller
      */
     public function buscarEntregasDeUnClienteDadoSuID(Request $request)
     {
-        
-        $entregas = Entrega::where('cliente_id', $request->id)->get();
-        //Hacer un for y buscar el nombre del cliente
+        if ($request->filled('id')) {
+            $entregas = Entrega::where('cliente_id', $request->id)
+                ->orderBy('id', 'desc')
+                ->get();                           
+        } else {
+            $entregas = Entrega::orderBy('id', 'desc')->get();
+        }
+
+        // Hacer un for y buscar el nombre del cliente
         foreach ($entregas as $entrega) {
             $cliente = Cliente::find($entrega->cliente_id);
             $entrega->cliente = $cliente->nombre;
         }
         
-
-
-        return response()->json(['id'=> $request->id,'data' => $entregas, 'status' => 'true'], 200);
+        return response()->json(['id' => $request->id, 'data' => $entregas, 'status' => 'true'], 200);
     }
 
     //Listar Entregas
@@ -231,11 +235,13 @@ class EntregaController extends Controller
             //Validar que si envia zona_entrega lo busca por zona de entrega con coincidencia, si envia direccion_entrega lo busca por direccion de entrega con coincidencia, si no envia nada trae todas las entregas
 
             if($request->zona_entrega != null){
-                $entrega = Entrega::where('zona_entrega', 'like', '%'.$request->zona_entrega.'%')->get();
+                $entrega = Entrega::where('zona_entrega', 'like', '%'.$request->zona_entrega.'%')->orderBy('id', 'desc')
+                ->get();
             }else if($request->direccion_entrega != null){
-                $entrega = Entrega::where('direccion_entrega', 'like', '%'.$request->direccion_entrega.'%')->get();
+                $entrega = Entrega::where('direccion_entrega', 'like', '%'.$request->direccion_entrega.'%')->orderBy('id', 'desc')
+                ->get();
             }else{
-                $entrega = Entrega::all();
+                $entrega = Entrega::orderBy('id', 'desc')->get();
             }
 
             //Sacar el nombre del cliente
